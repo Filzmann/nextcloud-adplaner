@@ -30,8 +30,10 @@ cd /var/www/vhosts/betriebsrat-ad.de/cloud.betriebsrat-ad.de/apps
 cp -R /pfad/zu/adplaner .
 cd /var/www/vhosts/betriebsrat-ad.de/cloud.betriebsrat-ad.de
 sudo -u betriebsrat php occ app:enable adplaner
-sudo -u betriebsrat php occ migrations:migrate adplaner
+sudo -u betriebsrat php occ status
 ```
+
+Nextcloud 34 hat keinen `occ migrations:migrate`-Befehl. App-Migrationen laufen beim Aktivieren der App bzw. ueber `occ upgrade`, wenn `occ status` `needsDbUpgrade: true` meldet.
 
 Dann in Nextcloud oeffnen:
 
