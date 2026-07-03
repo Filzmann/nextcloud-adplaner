@@ -12,6 +12,31 @@ Nextcloud-App-ID:
 
     adplaner
 
+## Zielsetzung
+
+AdPlaner soll Dienstplanung und Urlaubsplanung in Assistenzteams abbilden.
+
+Kernprozess:
+
+- Assistenznehmer werden aus Nextcloud-Gruppen `ad-ASN-<Kuerzel>` abgeleitet.
+- EB-Rechte erhalten Nutzer*innen, die zugleich im Team und in einer Gruppe `ad-EB-*` sind.
+- Monatliche Wunschplaene werden je Assistenzteam erstellt.
+- Die Schichtliste ist variabel konfigurierbar; Standard ist 08-14, 14-20 und 20-08.
+- Luecken und Ueberlappungen in Schichtdefinitionen sind moeglich und duerfen nicht vorschnell wegvalidiert werden.
+- Zuweisungen je Schicht folgen der Rollenlogik: eigene Eintraege durch Assistenz, fremde Zuweisungen nur durch EB.
+- EB-Konten selbst sind nicht schichtfaehig.
+- Jahres-Urlaubsplanung zeigt alle Tage als Spalten und Assistenzkraefte als Zeilen.
+- Urlaubswuensche sind globale Eintraege pro Assistenz und in allen Teams der Person sichtbar.
+- Optionale Urlaubssichtbarkeit laeuft ueber `ad-ASN-<Kuerzel>-Urlaub`; ohne diese Gruppe wird die Assistenznehmer-Gruppe selbst verwendet.
+- Statuswechsel wie `planned` und `approved` erfolgen nur durch EB.
+
+Offene Zielbereiche:
+
+- Produktive Rechte- und Datenschutzpruefung.
+- Feingranulare Urlaubsteilung, wenn nur ein Tag innerhalb eines Bereichs geaendert wird.
+- Export, Benachrichtigungen und Dienstplan-Festschreibung.
+- Spaetere Konfigurierbarkeit dort ausbauen, wo konkrete Teams unterschiedliche Regeln brauchen.
+
 ## Git- und Arbeitsregeln
 
 - Dieses Verzeichnis ist ein eigenstaendiges Git-Repository fuer die AD-App `adplaner`.
@@ -20,6 +45,7 @@ Nextcloud-App-ID:
 - Vor Commits immer `git status --short`, `git diff --stat` und `git diff --name-only` zeigen.
 - Nicht `git add .` verwenden; Dateien gezielt stagen.
 - Aenderungen klein, pruefbar und rueckbaubar halten.
+- Fuer groessere Refactorings, neue Datenmodelle oder neue Services soll ein eigener Branch vorgeschlagen werden.
 
 ## DDEV
 
@@ -58,3 +84,11 @@ Gruppenschema fuer `adplaner`:
 - Keine Architekturabstraktion wird vorsorglich gebaut. Auslagerung erfolgt, wenn sie konkrete Duplizierung, Testbarkeit oder Wartbarkeit verbessert.
 
 Diese Regeln gelten sinngemaess auch fuer andere eigene Nextcloud-Apps; die fachlichen Anwendungsfaelle bleiben aber getrennt.
+
+## Learnings pflegen
+
+- Wenn bei der Arbeit ein echtes, wiederverwendbares Projekt-Learning entsteht, soll Codex vorschlagen, es in dieser `AGENTS.md` zu ergaenzen.
+- Die Ergaenzung erfolgt erst nach ausdruecklicher Freigabe.
+- App-spezifische Learnings werden in diesem App-Repo gespeichert.
+- App-uebergreifende Learnings werden im Parent-Workspace dokumentiert und bei Bedarf in die App-`AGENTS.md` uebertragen.
+- Neue Regeln muessen dort stehen, wo sie gebraucht werden: AdPlaner-Fachlogik hier, DDEV-/Repo-/Neue-App-Regeln im Parent bzw. in allen betroffenen App-Repos.
