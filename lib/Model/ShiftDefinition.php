@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OCA\AdPlaner\Model;
+
+class ShiftDefinition {
+    public function __construct(
+        public string $key,
+        public string $label,
+        public string $startsAt,
+        public string $endsAt,
+        public bool $enabled = true
+    ) {
+    }
+
+    public static function fromArray(array $shift): self {
+        return new self(
+            (string)($shift['key'] ?? ''),
+            (string)($shift['label'] ?? ''),
+            (string)($shift['startsAt'] ?? ''),
+            (string)($shift['endsAt'] ?? ''),
+            (bool)($shift['enabled'] ?? true)
+        );
+    }
+
+    public function toApiArray(): array {
+        return [
+            'key' => $this->key,
+            'label' => $this->label,
+            'startsAt' => $this->startsAt,
+            'endsAt' => $this->endsAt,
+            'enabled' => $this->enabled,
+        ];
+    }
+}
