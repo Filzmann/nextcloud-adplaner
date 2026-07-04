@@ -1,5 +1,5 @@
 (function() {
-    const { Model } = window.ADPlaner.models;
+    const { Model } = window.LocalBase.models;
 
     class TeamSettings extends Model {
         constructor(data = {}) {

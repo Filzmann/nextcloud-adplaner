@@ -1,5 +1,6 @@
 (function() {
-    const { Model, Assistant } = window.ADPlaner.models;
+    const { Model } = window.LocalBase.models;
+    const { Assistant } = window.ADPlaner.models;
 
     class Team extends Model {
         constructor(data = {}) {

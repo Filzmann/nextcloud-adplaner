@@ -1,5 +1,6 @@
 (function() {
-    const { Model, ShiftCandidate } = window.ADPlaner.models;
+    const { Model } = window.LocalBase.models;
+    const { ShiftCandidate } = window.ADPlaner.models;
 
     class ShiftSlot extends Model {
         constructor(data = {}) {

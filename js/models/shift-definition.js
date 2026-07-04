@@ -1,5 +1,5 @@
 (function() {
-    const { Model } = window.ADPlaner.models;
+    const { Model } = window.LocalBase.models;
 
     class ShiftDefinition extends Model {
         constructor(data = {}) {

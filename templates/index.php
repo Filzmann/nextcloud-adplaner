@@ -1,7 +1,7 @@
 <?php
 script('adplaner', 'modules/api');
 script('adplaner', 'modules/ui');
-script('adplaner', 'models/model');
+script('localbase', 'models/model');
 script('adplaner', 'models/assistant');
 script('adplaner', 'models/shift-candidate');
 script('adplaner', 'models/shift-definition');

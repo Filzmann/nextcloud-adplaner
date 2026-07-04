@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OCA\AdPlaner\Model;
 
+use OCA\LocalBase\Model\ModelApiTrait;
+
 class Team {
     use ModelApiTrait;
 
