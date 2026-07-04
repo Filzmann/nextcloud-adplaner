@@ -12,6 +12,7 @@ script('adplaner', 'models/team-settings');
 script('adplaner', 'models/team');
 script('adplaner', 'models/vacation-request');
 script('adplaner', 'models/day-note');
+script('adplaner', 'repositories/plan-repository');
 script('adplaner', 'components/candidate-chip');
 script('adplaner', 'components/day-note-control');
 script('adplaner', 'components/assignment-control');

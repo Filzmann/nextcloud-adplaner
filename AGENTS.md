@@ -110,4 +110,5 @@ Wichtige lokale Pruefungen:
 
     find js -name '*.js' -print0 | xargs -0 -n1 node --check
     node tests/js/model-smoke.js
+    node tests/js/plan-repository-smoke.js
     for f in tests/Service/*.php; do php "$f"; done
