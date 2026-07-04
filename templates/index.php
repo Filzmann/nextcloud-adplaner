@@ -1,4 +1,5 @@
 <?php
+script('localbase', 'api/api-client');
 script('adplaner', 'modules/api');
 script('adplaner', 'modules/ui');
 script('localbase', 'models/model');
