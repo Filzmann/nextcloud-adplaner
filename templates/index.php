@@ -1,6 +1,15 @@
 <?php
 script('adplaner', 'modules/api');
 script('adplaner', 'modules/ui');
+script('adplaner', 'models/model');
+script('adplaner', 'models/assistant');
+script('adplaner', 'models/shift-candidate');
+script('adplaner', 'models/shift-definition');
+script('adplaner', 'models/shift-slot');
+script('adplaner', 'models/team-settings');
+script('adplaner', 'models/team');
+script('adplaner', 'models/vacation-request');
+script('adplaner', 'models/day-note');
 script('adplaner', 'components/candidate-chip');
 script('adplaner', 'components/day-note-control');
 script('adplaner', 'components/assignment-control');

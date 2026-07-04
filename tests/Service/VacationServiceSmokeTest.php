@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require __DIR__ . '/../../lib/Model/ModelApiTrait.php';
 require __DIR__ . '/../../lib/Model/Assistant.php';
 require __DIR__ . '/../../lib/Model/ShiftDefinition.php';
 require __DIR__ . '/../../lib/Model/Team.php';
@@ -12,6 +13,7 @@ require __DIR__ . '/../../lib/Service/VacationService.php';
 require __DIR__ . '/../../lib/Store/VacationStore.php';
 
 use OCA\AdPlaner\Model\Team;
+use OCA\AdPlaner\Model\VacationRequest;
 use OCA\AdPlaner\Repository\VacationRepository;
 use OCA\AdPlaner\Service\ShiftConfigService;
 use OCA\AdPlaner\Service\VacationService;
@@ -83,6 +85,17 @@ $team = new Team(
     true,
     []
 );
+
+$request = VacationRequest::get([
+    'id' => 5,
+    'assistantUid' => 'vac-a',
+    'dateFrom' => '2026-07-01',
+    'dateTo' => '2026-07-02',
+    'status' => 'planned',
+    'note' => 'Test',
+]);
+$checkSame(true, $request instanceof VacationRequest, 'VacationRequest::get should hydrate API data.');
+$checkSame('vac-a', $request->toArray()['assistantUid'], 'VacationRequest::toArray should keep the API payload shape.');
 
 $repository = new FakeVacationRepository();
 $service = new VacationService(new VacationStore($repository), new ShiftConfigService());

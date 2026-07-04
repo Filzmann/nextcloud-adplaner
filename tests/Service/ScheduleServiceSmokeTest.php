@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require __DIR__ . '/../../lib/Model/ModelApiTrait.php';
 require __DIR__ . '/../../lib/Model/Assistant.php';
 require __DIR__ . '/../../lib/Model/ShiftCandidate.php';
 require __DIR__ . '/../../lib/Model/ShiftDefinition.php';
@@ -101,6 +102,11 @@ $assistants = [
     ['uid' => 'test-eb', 'displayName' => 'Test EB', 'isEb' => true, 'canReceiveShifts' => false],
 ];
 
+$assistantModel = \OCA\AdPlaner\Model\Assistant::get($assistants[0]);
+$assistantModels = \OCA\AdPlaner\Model\Assistant::get_all($assistants);
+$checkSame(true, $assistantModel instanceof \OCA\AdPlaner\Model\Assistant, 'Assistant::get should hydrate API data.');
+$checkSame(2, count($assistantModels), 'Assistant::get_all should hydrate API lists.');
+
 $settings = [
     'shifts' => [
         ['key' => 'early', 'label' => 'Frueh', 'startsAt' => '08:00', 'endsAt' => '14:00', 'enabled' => true],
@@ -109,6 +115,9 @@ $settings = [
 
 $assistantTeam = new Team('A1', 'ad-ASN-A1', 'ad-ASN-A1-Urlaub', 'Team A1', $assistants, $assistants, false, $settings);
 $ebTeam = new Team('A1', 'ad-ASN-A1', 'ad-ASN-A1-Urlaub', 'Team A1', $assistants, $assistants, true, $settings);
+$mappedTeam = Team::get($ebTeam->toApiArray());
+$checkSame('Team A1', $mappedTeam->toArray()['displayName'], 'Team::get should keep the API payload shape.');
+
 $store = new FakeShiftPlanStoreForSchedule();
 $service = new ScheduleService($store, new ShiftConfigService(), new FakeTeamAccessServiceForSchedule());
 

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OCA\AdPlaner\Model;
 
 class Team {
+    use ModelApiTrait;
+
     public function __construct(
         public string $code,
         public string $groupName,
@@ -17,6 +19,21 @@ class Team {
     ) {
         $this->assistants = $this->normalizeAssistants($this->assistants);
         $this->vacationAssistants = $this->normalizeAssistants($this->vacationAssistants);
+    }
+
+    public static function fromArray(array $data): self {
+        return new self(
+            (string)($data['code'] ?? ''),
+            (string)($data['groupName'] ?? $data['group_name'] ?? ''),
+            (string)($data['vacationGroupName'] ?? $data['vacation_group_name'] ?? ''),
+            (string)($data['displayName'] ?? $data['display_name'] ?? ''),
+            is_array($data['assistants'] ?? null) ? $data['assistants'] : [],
+            is_array($data['vacationAssistants'] ?? $data['vacation_assistants'] ?? null)
+                ? ($data['vacationAssistants'] ?? $data['vacation_assistants'])
+                : [],
+            (bool)($data['isEb'] ?? $data['is_eb'] ?? $data['canCoordinate'] ?? false),
+            is_array($data['settings'] ?? null) ? $data['settings'] : []
+        );
     }
 
     public function toApiArray(): array {

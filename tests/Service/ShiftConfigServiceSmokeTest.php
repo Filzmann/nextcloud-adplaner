@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require __DIR__ . '/../../lib/Model/ModelApiTrait.php';
 require __DIR__ . '/../../lib/Model/ShiftDefinition.php';
 require __DIR__ . '/../../lib/Service/ShiftConfigService.php';
 
@@ -19,8 +20,10 @@ $checkSame = static function ($expected, $actual, string $message): void {
 $service = new ShiftConfigService();
 $defaults = $service->defaults();
 $defaultSegments = $service->segments($defaults);
+$defaultModels = \OCA\AdPlaner\Model\ShiftDefinition::get_all($defaultSegments);
 
 $checkSame(['early', 'late', 'night'], array_column($defaultSegments, 'key'), 'Default shifts should use the normal three-shift setup.');
+$checkSame(3, count($defaultModels), 'ShiftDefinition::get_all should hydrate API lists.');
 $checkSame('08:00', $defaultSegments[0]['startsAt'], 'Default early shift should start at 08:00.');
 $checkSame('14:00', $defaultSegments[0]['endsAt'], 'Default early shift should end at 14:00.');
 $checkSame('20:00', $defaultSegments[2]['startsAt'], 'Default night shift should start at 20:00.');

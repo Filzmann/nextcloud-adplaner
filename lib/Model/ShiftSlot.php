@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OCA\AdPlaner\Model;
 
 class ShiftSlot {
+    use ModelApiTrait;
+
     public function __construct(
         public int $id,
         public string $teamCode,
@@ -19,19 +21,25 @@ class ShiftSlot {
     ) {
     }
 
-    public static function fromRow(array $row, array $candidates = []): self {
+    public static function fromArray(array $data): self {
         return new self(
-            (int)$row['id'],
-            (string)$row['team_code'],
-            (string)$row['plan_month'],
-            (string)$row['work_date'],
-            (string)$row['segment_key'],
-            (string)$row['label'],
-            (string)$row['starts_at'],
-            (string)$row['ends_at'],
-            (int)$row['enabled'] === 1,
-            $candidates
+            (int)($data['id'] ?? 0),
+            (string)($data['teamCode'] ?? $data['team_code'] ?? ''),
+            (string)($data['planMonth'] ?? $data['plan_month'] ?? ''),
+            (string)($data['workDate'] ?? $data['work_date'] ?? ''),
+            (string)($data['segmentKey'] ?? $data['segment_key'] ?? ''),
+            (string)($data['label'] ?? ''),
+            (string)($data['startsAt'] ?? $data['starts_at'] ?? ''),
+            (string)($data['endsAt'] ?? $data['ends_at'] ?? ''),
+            (bool)($data['enabled'] ?? true),
+            ShiftCandidate::get_all(is_array($data['candidates'] ?? null) ? $data['candidates'] : [])
         );
+    }
+
+    public static function fromRow(array $row, array $candidates = []): self {
+        $row['candidates'] = $candidates;
+
+        return self::fromArray($row);
     }
 
     public function toApiArray(): array {
@@ -45,7 +53,10 @@ class ShiftSlot {
             'startsAt' => $this->startsAt,
             'endsAt' => $this->endsAt,
             'enabled' => $this->enabled,
-            'candidates' => $this->candidates,
+            'candidates' => array_map(
+                static fn($candidate): array => $candidate instanceof ShiftCandidate ? $candidate->toApiArray() : (array)$candidate,
+                $this->candidates
+            ),
         ];
     }
 }

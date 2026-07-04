@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OCA\AdPlaner\Model;
 
 class Assistant {
+    use ModelApiTrait;
+
     public function __construct(
         public string $uid,
         public string $displayName,

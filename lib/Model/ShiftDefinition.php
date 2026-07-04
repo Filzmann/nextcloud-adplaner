@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OCA\AdPlaner\Model;
 
 class ShiftDefinition {
+    use ModelApiTrait;
+
     public function __construct(
         public string $key,
         public string $label,
@@ -18,8 +20,8 @@ class ShiftDefinition {
         return new self(
             (string)($shift['key'] ?? ''),
             (string)($shift['label'] ?? ''),
-            (string)($shift['startsAt'] ?? ''),
-            (string)($shift['endsAt'] ?? ''),
+            (string)($shift['startsAt'] ?? $shift['starts_at'] ?? ''),
+            (string)($shift['endsAt'] ?? $shift['ends_at'] ?? ''),
             (bool)($shift['enabled'] ?? true)
         );
     }

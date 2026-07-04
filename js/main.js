@@ -4,6 +4,7 @@
     const { render: renderMonthPlan } = window.ADPlaner.monthPlan;
     const { render: renderVacationPlan } = window.ADPlaner.vacationPlan;
     const { render: renderSettingsPanel } = window.ADPlaner.settingsPanel;
+    const { ShiftDefinition, ShiftSlot, Team, VacationRequest } = window.ADPlaner.models;
     const {
         addRow: addShiftRow,
         removeRow: removeShiftRow,
@@ -31,11 +32,43 @@
         return '/api/teams/' + encode(state.selectedTeamCode);
     }
 
+    function hydrateTeams(teams) {
+        return Team.get_all(teams || []);
+    }
+
+    function hydrateMonthPlan(plan) {
+        if (!plan) {
+            return null;
+        }
+
+        return {
+            ...plan,
+            team: Team.get(plan.team),
+            segments: ShiftDefinition.get_all(plan.segments || []),
+            days: (plan.days || []).map(day => ({
+                ...day,
+                slots: ShiftSlot.get_all(day.slots || [])
+            }))
+        };
+    }
+
+    function hydrateVacationPlan(plan) {
+        if (!plan) {
+            return null;
+        }
+
+        return {
+            ...plan,
+            team: Team.get(plan.team),
+            requests: VacationRequest.get_all(plan.requests || [])
+        };
+    }
+
     async function init() {
         try {
             const data = await api('/api/state');
             state.currentUser = data.currentUser || null;
-            state.teams = data.teams || [];
+            state.teams = hydrateTeams(data.teams);
             state.month = data.defaultMonth || new Date().toISOString().slice(0, 7);
             state.year = String(data.defaultYear || new Date().getFullYear());
             state.selectedTeamCode = state.teams.length ? state.teams[0].code : '';
@@ -120,20 +153,20 @@
     async function refreshState() {
         const data = await api('/api/state');
         state.currentUser = data.currentUser || state.currentUser;
-        state.teams = data.teams || [];
+        state.teams = hydrateTeams(data.teams);
         if (!state.teams.some(team => team.code === state.selectedTeamCode)) {
             state.selectedTeamCode = state.teams.length ? state.teams[0].code : '';
         }
     }
 
     async function loadMonth() {
-        state.monthPlan = await api(teamPath() + '/months/' + encode(state.month));
+        state.monthPlan = hydrateMonthPlan(await api(teamPath() + '/months/' + encode(state.month)));
         const updatedTeam = state.monthPlan.team;
         state.teams = state.teams.map(team => team.code === updatedTeam.code ? updatedTeam : team);
     }
 
     async function loadVacation() {
-        state.vacationPlan = await api(teamPath() + '/vacations/' + encode(state.year));
+        state.vacationPlan = hydrateVacationPlan(await api(teamPath() + '/vacations/' + encode(state.year)));
         const updatedTeam = state.vacationPlan.team;
         state.teams = state.teams.map(team => team.code === updatedTeam.code ? updatedTeam : team);
     }

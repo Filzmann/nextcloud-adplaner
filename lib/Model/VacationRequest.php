@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OCA\AdPlaner\Model;
 
 class VacationRequest {
+    use ModelApiTrait;
+
     public function __construct(
         public int $id,
         public string $assistantUid,
@@ -15,15 +17,19 @@ class VacationRequest {
     ) {
     }
 
-    public static function fromRow(array $row): self {
+    public static function fromArray(array $data): self {
         return new self(
-            (int)$row['id'],
-            (string)$row['assistant_uid'],
-            (string)$row['date_from'],
-            (string)$row['date_to'],
-            (string)$row['status'],
-            (string)($row['note'] ?? '')
+            (int)($data['id'] ?? 0),
+            (string)($data['assistantUid'] ?? $data['assistant_uid'] ?? ''),
+            (string)($data['dateFrom'] ?? $data['date_from'] ?? ''),
+            (string)($data['dateTo'] ?? $data['date_to'] ?? ''),
+            (string)($data['status'] ?? ''),
+            (string)($data['note'] ?? '')
         );
+    }
+
+    public static function fromRow(array $row): self {
+        return self::fromArray($row);
     }
 
     public function toApiArray(): array {
