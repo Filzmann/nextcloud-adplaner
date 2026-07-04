@@ -1,0 +1,82 @@
+const assert = require('assert');
+
+global.window = {};
+
+require('../../../localbase/js/ui/ui.js');
+require('../../js/modules/ui.js');
+require('../../js/components/candidate-chip.js');
+require('../../js/components/day-note-control.js');
+require('../../js/components/assignment-control.js');
+require('../../js/components/month-plan.js');
+
+const { monthPlan } = window.ADPlaner;
+
+const basePlan = {
+    month: '2026-07',
+    segments: [
+        { key: 'early', label: 'Frueh <A>', startsAt: '08:00', endsAt: '14:00' },
+        { key: 'late', label: 'Spaet', startsAt: '14:00', endsAt: '20:00' }
+    ],
+    days: [
+        {
+            date: '2026-07-01',
+            dayOfMonth: 1,
+            weekday: 3,
+            note: '<Hinweis>',
+            slots: [
+                { id: 10, segmentKey: 'early', candidates: [] },
+                {
+                    id: 11,
+                    segmentKey: 'late',
+                    candidates: [
+                        { uid: 'assistant-a', displayName: 'Assistant A', isSelf: true }
+                    ]
+                }
+            ]
+        }
+    ]
+};
+
+const assistantHtml = monthPlan.render({
+    ...basePlan,
+    team: {
+        code: 'A1',
+        displayName: 'Team <A1>',
+        canCoordinate: false,
+        settings: { meetingDay: '2026-07-15' },
+        assistants: []
+    }
+}, { uid: 'assistant-a' });
+
+assert(assistantHtml.includes('Team &lt;A1&gt; - 2026-07'));
+assert(!assistantHtml.includes('Team <A1>'));
+assert(assistantHtml.includes('Treffen 15.07.'));
+assert(assistantHtml.includes('Frueh &lt;A&gt;'));
+assert(assistantHtml.includes('Mi<span>1</span>'));
+assert(assistantHtml.includes('data-action="add-self" data-slot-id="10"'));
+assert(!assistantHtml.includes('data-action="add-self" data-slot-id="11"'));
+assert(!assistantHtml.includes('adp-assignment-control'));
+assert(assistantHtml.includes('<span class="adp-note-text">&lt;Hinweis&gt;</span>'));
+assert(!assistantHtml.includes('<Hinweis>'));
+
+const ebHtml = monthPlan.render({
+    ...basePlan,
+    team: {
+        code: 'A1',
+        displayName: 'Team A1',
+        canCoordinate: true,
+        settings: {},
+        assistants: [
+            { uid: 'assistant-a', displayName: 'Assistant A', canReceiveShifts: true },
+            { uid: 'assistant-b', displayName: 'Assistant B', canReceiveShifts: true }
+        ]
+    }
+}, { uid: 'eb' });
+
+assert(!ebHtml.includes('data-action="add-self"'));
+assert(ebHtml.includes('adp-assignment-control'));
+assert(ebHtml.includes('data-action="remove-candidate" data-slot-id="11" data-target-uid="assistant-a"'));
+assert(ebHtml.includes('<textarea rows="2" data-note-date="2026-07-01">&lt;Hinweis&gt;</textarea>'));
+assert(ebHtml.includes('value="assistant-b"'));
+
+console.log('AdPlaner month plan smoke test passed.');
