@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require __DIR__ . '/helpers.php';
 require __DIR__ . '/../../../localbase/lib/Model/ModelApiTrait.php';
 require __DIR__ . '/../../lib/Model/Assistant.php';
 require __DIR__ . '/../../lib/Model/ShiftCandidate.php';
@@ -21,6 +22,8 @@ use OCA\AdPlaner\Service\ScheduleService;
 use OCA\AdPlaner\Service\ShiftConfigService;
 use OCA\AdPlaner\Service\TeamAccessService;
 use OCA\AdPlaner\Store\ShiftPlanStore;
+use function OCA\AdPlaner\Tests\assertDomainException;
+use function OCA\AdPlaner\Tests\assertSameValue;
 
 class FakeShiftPlanStoreForSchedule extends ShiftPlanStore {
     public array $added = [];
@@ -113,26 +116,6 @@ class FakeTeamAccessServiceForSchedule extends TeamAccessService {
     }
 }
 
-$checkSame = static function ($expected, $actual, string $message): void {
-    if ($expected !== $actual) {
-        fwrite(STDERR, $message . PHP_EOL);
-        fwrite(STDERR, 'Expected: ' . var_export($expected, true) . PHP_EOL);
-        fwrite(STDERR, 'Actual:   ' . var_export($actual, true) . PHP_EOL);
-        exit(1);
-    }
-};
-
-$checkThrows = static function (callable $callback, string $message): void {
-    try {
-        $callback();
-    } catch (\DomainException) {
-        return;
-    }
-
-    fwrite(STDERR, $message . PHP_EOL);
-    exit(1);
-};
-
 $assistants = [
     ['uid' => 'assistant-a', 'displayName' => 'Assistant A', 'isEb' => false, 'canReceiveShifts' => true],
     ['uid' => 'test-eb', 'displayName' => 'Test EB', 'isEb' => true, 'canReceiveShifts' => false],
@@ -140,8 +123,8 @@ $assistants = [
 
 $assistantModel = \OCA\AdPlaner\Model\Assistant::get($assistants[0]);
 $assistantModels = \OCA\AdPlaner\Model\Assistant::get_all($assistants);
-$checkSame(true, $assistantModel instanceof \OCA\AdPlaner\Model\Assistant, 'Assistant::get should hydrate API data.');
-$checkSame(2, count($assistantModels), 'Assistant::get_all should hydrate API lists.');
+assertSameValue(true, $assistantModel instanceof \OCA\AdPlaner\Model\Assistant, 'Assistant::get should hydrate API data.');
+assertSameValue(2, count($assistantModels), 'Assistant::get_all should hydrate API lists.');
 
 $settings = [
     'shifts' => [
@@ -152,33 +135,33 @@ $settings = [
 $assistantTeam = new Team('A1', 'ad-ASN-A1', 'ad-ASN-A1-Urlaub', 'Team A1', $assistants, $assistants, false, $settings);
 $ebTeam = new Team('A1', 'ad-ASN-A1', 'ad-ASN-A1-Urlaub', 'Team A1', $assistants, $assistants, true, $settings);
 $mappedTeam = Team::get($ebTeam->toArray());
-$checkSame('Team A1', $mappedTeam->toArray()['displayName'], 'Team::get should keep the API payload shape.');
+assertSameValue('Team A1', $mappedTeam->toArray()['displayName'], 'Team::get should keep the API payload shape.');
 
 $store = new FakeShiftPlanStoreForSchedule();
 $service = new ScheduleService($store, new ShiftConfigService(), new FakeTeamAccessServiceForSchedule());
 
 $service->addCandidate($assistantTeam, '2026-07', 9, '', 'assistant-a');
-$checkSame('assistant-a', $store->added[0]['assistantUid'] ?? null, 'Assistant should be able to add themself.');
+assertSameValue('assistant-a', $store->added[0]['assistantUid'] ?? null, 'Assistant should be able to add themself.');
 
 $service->addCandidate($ebTeam, '2026-07', 9, 'assistant-a', 'test-eb');
-$checkSame('assistant-a', $store->added[1]['assistantUid'] ?? null, 'EB should be able to assign an assistant.');
+assertSameValue('assistant-a', $store->added[1]['assistantUid'] ?? null, 'EB should be able to assign an assistant.');
 
-$checkThrows(
+assertDomainException(
     static fn() => $service->addCandidate($ebTeam, '2026-07', 9, '', 'test-eb'),
     'EB should not be able to add themself without selecting an assistant.'
 );
-$checkThrows(
+assertDomainException(
     static fn() => $service->addCandidate($ebTeam, '2026-07', 9, 'test-eb', 'test-eb'),
     'EB accounts should not be assignable to shifts.'
 );
-$checkThrows(
+assertDomainException(
     static fn() => $service->addCandidate($assistantTeam, '2026-07', 9, 'test-eb', 'assistant-a'),
     'Assistants should not assign other users.'
 );
 
 $plan = $service->monthPlan($ebTeam, '2026-07', 'test-eb');
 $slotCandidates = $plan['days'][0]['slots'][0]['candidates'] ?? [];
-$checkSame(['assistant-a'], array_column($slotCandidates, 'uid'), 'Month plan should hide non-assignable EB candidates.');
+assertSameValue(['assistant-a'], array_column($slotCandidates, 'uid'), 'Month plan should hide non-assignable EB candidates.');
 
 $configuredStore = new FakeShiftPlanStoreForSchedule();
 $configuredStore->slots = [
@@ -199,10 +182,10 @@ foreach ($configuredStore->updatedSlots as $updatedSlot) {
     $updatesById[$updatedSlot['slotId']] = $updatedSlot;
 }
 
-$checkSame('Frueh neu', $updatesById[10]['label'] ?? null, 'Existing slots should be updated to the current shift label.');
-$checkSame(false, $updatesById[11]['enabled'] ?? null, 'Slots for removed shift segments should be disabled.');
-$checkSame('late', $configuredStore->insertedSlots[0]['segmentKey'] ?? null, 'Missing enabled segments should be inserted for the first day.');
-$checkSame(false, in_array('night', array_column($configuredStore->insertedSlots, 'segmentKey'), true), 'Disabled shift segments should not be inserted.');
-$checkSame('Frueh neu', $configuredPlan['days'][0]['slots'][0]['label'] ?? null, 'Month plan should use refreshed slot definitions.');
+assertSameValue('Frueh neu', $updatesById[10]['label'] ?? null, 'Existing slots should be updated to the current shift label.');
+assertSameValue(false, $updatesById[11]['enabled'] ?? null, 'Slots for removed shift segments should be disabled.');
+assertSameValue('late', $configuredStore->insertedSlots[0]['segmentKey'] ?? null, 'Missing enabled segments should be inserted for the first day.');
+assertSameValue(false, in_array('night', array_column($configuredStore->insertedSlots, 'segmentKey'), true), 'Disabled shift segments should not be inserted.');
+assertSameValue('Frueh neu', $configuredPlan['days'][0]['slots'][0]['label'] ?? null, 'Month plan should use refreshed slot definitions.');
 
 echo 'AdPlaner schedule smoke tests passed' . PHP_EOL;

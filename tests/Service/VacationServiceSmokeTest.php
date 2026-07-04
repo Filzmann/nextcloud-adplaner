@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require __DIR__ . '/helpers.php';
 require __DIR__ . '/../../../localbase/lib/Model/ModelApiTrait.php';
 require __DIR__ . '/../../lib/Model/Assistant.php';
 require __DIR__ . '/../../lib/Model/ShiftDefinition.php';
@@ -18,6 +19,7 @@ use OCA\AdPlaner\Repository\VacationRepository;
 use OCA\AdPlaner\Service\ShiftConfigService;
 use OCA\AdPlaner\Service\VacationService;
 use OCA\AdPlaner\Store\VacationStore;
+use function OCA\AdPlaner\Tests\assertSameValue;
 
 class FakeVacationRepository extends VacationRepository {
     public array $seenAssistantUids = [];
@@ -60,15 +62,6 @@ class FakeVacationRepository extends VacationRepository {
     }
 }
 
-$checkSame = static function ($expected, $actual, string $message): void {
-    if ($expected !== $actual) {
-        fwrite(STDERR, $message . PHP_EOL);
-        fwrite(STDERR, 'Expected: ' . var_export($expected, true) . PHP_EOL);
-        fwrite(STDERR, 'Actual:   ' . var_export($actual, true) . PHP_EOL);
-        exit(1);
-    }
-};
-
 $team = new Team(
     'A1',
     'ad-ASN-A1',
@@ -94,25 +87,25 @@ $request = VacationRequest::get([
     'status' => 'planned',
     'note' => 'Test',
 ]);
-$checkSame(true, $request instanceof VacationRequest, 'VacationRequest::get should hydrate API data.');
-$checkSame('vac-a', $request->toArray()['assistantUid'], 'VacationRequest::toArray should keep the API payload shape.');
+assertSameValue(true, $request instanceof VacationRequest, 'VacationRequest::get should hydrate API data.');
+assertSameValue('vac-a', $request->toArray()['assistantUid'], 'VacationRequest::toArray should keep the API payload shape.');
 
 $repository = new FakeVacationRepository();
 $service = new VacationService(new VacationStore($repository), new ShiftConfigService());
 $plan = $service->yearPlan($team, 2026, 'vac-a');
 
-$checkSame(['vac-a', 'teamB'], $repository->seenAssistantUids, 'Vacation plan should query vacation visibility assistants.');
-$checkSame(['vac-a', 'teamB'], array_column($plan['assistants'], 'uid'), 'Vacation plan rows should use vacation visibility assistants.');
+assertSameValue(['vac-a', 'teamB'], $repository->seenAssistantUids, 'Vacation plan should query vacation visibility assistants.');
+assertSameValue(['vac-a', 'teamB'], array_column($plan['assistants'], 'uid'), 'Vacation plan rows should use vacation visibility assistants.');
 $rowsByUid = [];
 foreach ($plan['assistants'] as $row) {
     $rowsByUid[$row['uid']] = $row;
 }
-$checkSame('planned', $rowsByUid['vac-a']['days']['2026-07-01']['status'] ?? null, 'Vacation cells should expose planned days.');
-$checkSame('approved', $rowsByUid['teamB']['days']['2026-07-03']['status'] ?? null, 'Vacation cells should expose approved days.');
-$checkSame('', $rowsByUid['teamB']['days']['2026-07-04']['status'] ?? null, 'Vacation cells should stay empty outside vacation ranges.');
+assertSameValue('planned', $rowsByUid['vac-a']['days']['2026-07-01']['status'] ?? null, 'Vacation cells should expose planned days.');
+assertSameValue('approved', $rowsByUid['teamB']['days']['2026-07-03']['status'] ?? null, 'Vacation cells should expose approved days.');
+assertSameValue('', $rowsByUid['teamB']['days']['2026-07-04']['status'] ?? null, 'Vacation cells should stay empty outside vacation ranges.');
 
 $service->setStatusForDate($team, 'vac-a', '2026-07-03', 'approved', 'eb');
-$checkSame('vac-a', $repository->created[0]['assistantUid'] ?? null, 'EB should be able to set status for vacation-visible assistants.');
-$checkSame('approved', $repository->created[0]['status'] ?? null, 'Status should be forwarded to created vacation entry.');
+assertSameValue('vac-a', $repository->created[0]['assistantUid'] ?? null, 'EB should be able to set status for vacation-visible assistants.');
+assertSameValue('approved', $repository->created[0]['status'] ?? null, 'Status should be forwarded to created vacation entry.');
 
 echo 'AdPlaner vacation smoke tests passed' . PHP_EOL;

@@ -53,6 +53,10 @@ foreach ($lintFiles as $file) {
 }
 
 foreach (collect_php_files($root, ['tests/Service']) as $file) {
+    if (!str_ends_with($file, 'SmokeTest.php')) {
+        continue;
+    }
+
     run_test_command($root, ['php', relative_test_path($root, $file)]);
 }
 
