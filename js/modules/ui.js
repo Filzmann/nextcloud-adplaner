@@ -1,5 +1,6 @@
 (function() {
-    const { byId, esc } = window.LocalBase.ui;
+    const { Notice, byId, esc } = window.LocalBase.ui;
+    const notice = new Notice('adp-notice');
     const weekday = ['', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
     const monthName = ['', 'Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
 
@@ -31,9 +32,7 @@
     }
 
     function showNotice(message) {
-        const notice = byId('adp-notice');
-        notice.hidden = !message;
-        notice.textContent = message || '';
+        notice.show(message);
     }
 
     window.ADPlaner = window.ADPlaner || {};
