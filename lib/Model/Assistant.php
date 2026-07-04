@@ -35,7 +35,7 @@ class Assistant {
         );
     }
 
-    public function toApiArray(): array {
+    public function toArray(): array {
         return [
             'uid' => $this->uid,
             'displayName' => $this->displayName,

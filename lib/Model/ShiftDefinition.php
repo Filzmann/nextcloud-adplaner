@@ -26,7 +26,7 @@ class ShiftDefinition {
         );
     }
 
-    public function toApiArray(): array {
+    public function toArray(): array {
         return [
             'key' => $this->key,
             'label' => $this->label,

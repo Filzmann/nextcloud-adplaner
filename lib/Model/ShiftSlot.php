@@ -42,7 +42,7 @@ class ShiftSlot {
         return self::fromArray($row);
     }
 
-    public function toApiArray(): array {
+    public function toArray(): array {
         return [
             'id' => $this->id,
             'teamCode' => $this->teamCode,
@@ -54,7 +54,7 @@ class ShiftSlot {
             'endsAt' => $this->endsAt,
             'enabled' => $this->enabled,
             'candidates' => array_map(
-                static fn($candidate): array => $candidate instanceof ShiftCandidate ? $candidate->toApiArray() : (array)$candidate,
+                static fn($candidate): array => $candidate instanceof ShiftCandidate ? $candidate->toArray() : (array)$candidate,
                 $this->candidates
             ),
         ];

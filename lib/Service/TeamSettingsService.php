@@ -17,7 +17,7 @@ class TeamSettingsService {
         return $this->store->forTeam($teamCode);
     }
 
-    public function saveFromApi(string $teamCode, string $displayName, array $config): array {
-        return $this->store->saveFromApi($teamCode, $displayName, $config)->toApiArray();
+    public function save(string $teamCode, string $displayName, array $config): array {
+        return $this->store->save($teamCode, $displayName, $config)->toArray();
     }
 }

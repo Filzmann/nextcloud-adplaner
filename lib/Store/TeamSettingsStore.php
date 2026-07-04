@@ -33,7 +33,7 @@ class TeamSettingsStore {
         );
     }
 
-    public function saveFromApi(string $teamCode, string $displayName, array $config): TeamSettings {
+    public function save(string $teamCode, string $displayName, array $config): TeamSettings {
         $displayName = trim($displayName);
         if ($displayName === '') {
             $displayName = $teamCode;

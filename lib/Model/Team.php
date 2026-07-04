@@ -36,14 +36,14 @@ class Team {
         );
     }
 
-    public function toApiArray(): array {
+    public function toArray(): array {
         return [
             'code' => $this->code,
             'groupName' => $this->groupName,
             'vacationGroupName' => $this->vacationGroupName,
             'displayName' => $this->displayName,
-            'assistants' => $this->assistantsApiArray(),
-            'vacationAssistants' => $this->vacationAssistantsApiArray(),
+            'assistants' => $this->assistantsArray(),
+            'vacationAssistants' => $this->vacationAssistantsArray(),
             'isEb' => $this->isEb,
             'canCoordinate' => $this->isEb,
             'settings' => $this->settings,
@@ -58,12 +58,12 @@ class Team {
         return $this->vacationAssistants;
     }
 
-    public function assistantsApiArray(): array {
-        return array_map(static fn(Assistant $assistant): array => $assistant->toApiArray(), $this->assistants);
+    public function assistantsArray(): array {
+        return array_map(static fn(Assistant $assistant): array => $assistant->toArray(), $this->assistants);
     }
 
-    public function vacationAssistantsApiArray(): array {
-        return array_map(static fn(Assistant $assistant): array => $assistant->toApiArray(), $this->vacationAssistants);
+    public function vacationAssistantsArray(): array {
+        return array_map(static fn(Assistant $assistant): array => $assistant->toArray(), $this->vacationAssistants);
     }
 
     public function assistantLabelMap(): array {

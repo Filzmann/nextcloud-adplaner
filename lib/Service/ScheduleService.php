@@ -35,7 +35,7 @@ class ScheduleService {
                 static fn(ShiftCandidate $candidate): bool => isset($assignableUids[$candidate->assistantUid])
             ));
             $slot->candidates = $this->candidatePayload($slotCandidates, $assistantLabels, $currentUid);
-            $slotsByDate[$slot->workDate][] = $slot->toApiArray();
+            $slotsByDate[$slot->workDate][] = $slot->toArray();
         }
 
         $days = [];
@@ -51,7 +51,7 @@ class ScheduleService {
         }
 
         return [
-            'team' => $team->toApiArray(),
+            'team' => $team->toArray(),
             'month' => $month,
             'segments' => array_values(array_filter($this->shiftConfig->segments($team->settings), static fn(array $segment): bool => $segment['enabled'])),
             'days' => $days,
@@ -161,7 +161,7 @@ class ScheduleService {
 
     private function candidatePayload(array $candidates, array $assistantLabels, string $currentUid): array {
         return array_map(
-            static fn(ShiftCandidate $candidate): array => $candidate->toApiArray($assistantLabels, $currentUid),
+            static fn(ShiftCandidate $candidate): array => $candidate->toArray($assistantLabels, $currentUid),
             $candidates
         );
     }

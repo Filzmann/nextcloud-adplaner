@@ -34,7 +34,7 @@ class ShiftCandidate {
         return self::fromArray($row);
     }
 
-    public function toApiArray(array $assistantLabels = [], string $currentUid = ''): array {
+    public function toArray(array $assistantLabels = [], string $currentUid = ''): array {
         return [
             'id' => $this->id,
             'uid' => $this->assistantUid,

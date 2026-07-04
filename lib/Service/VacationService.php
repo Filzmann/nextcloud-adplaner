@@ -33,11 +33,11 @@ class VacationService {
         }
 
         return [
-            'team' => $team->toApiArray(),
+            'team' => $team->toArray(),
             'year' => $year,
             'days' => $days,
             'assistants' => $rows,
-            'requests' => array_map(static fn(VacationRequest $request): array => $request->toApiArray(), $requests),
+            'requests' => array_map(static fn(VacationRequest $request): array => $request->toArray(), $requests),
         ];
     }
 

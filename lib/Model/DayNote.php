@@ -30,7 +30,7 @@ class DayNote {
         return self::fromArray($row);
     }
 
-    public function toApiArray(): array {
+    public function toArray(): array {
         return [
             'teamCode' => $this->teamCode,
             'workDate' => $this->workDate,

@@ -216,7 +216,7 @@ class ShiftConfigService {
     }
 
     private function shift(string $key, string $label, string $startsAt, string $endsAt, bool $enabled): array {
-        return (new ShiftDefinition($key, $label, $startsAt, $endsAt, $enabled))->toApiArray();
+        return (new ShiftDefinition($key, $label, $startsAt, $endsAt, $enabled))->toArray();
     }
 
     private function normalizeOptionalDate(string $date): string {

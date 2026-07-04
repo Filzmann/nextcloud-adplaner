@@ -36,7 +36,7 @@ class ApiController extends Controller {
             return [
                 'currentUser' => ['uid' => $uid],
                 'teams' => array_map(
-                    static fn($team): array => $team->toApiArray(),
+                    static fn($team): array => $team->toArray(),
                     $this->teamAccess->teamsForCurrentUser()
                 ),
                 'defaultMonth' => date('Y-m'),
@@ -100,7 +100,7 @@ class ApiController extends Controller {
                 ];
             }
 
-            $settings = $this->teamSettings->saveFromApi($team->code, $displayName, $config);
+            $settings = $this->teamSettings->save($team->code, $displayName, $config);
 
             return ['ok' => true, 'settings' => $settings];
         }, 'save_team_settings', ['team_code' => $teamCode]);

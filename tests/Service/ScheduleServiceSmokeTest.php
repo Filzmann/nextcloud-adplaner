@@ -115,7 +115,7 @@ $settings = [
 
 $assistantTeam = new Team('A1', 'ad-ASN-A1', 'ad-ASN-A1-Urlaub', 'Team A1', $assistants, $assistants, false, $settings);
 $ebTeam = new Team('A1', 'ad-ASN-A1', 'ad-ASN-A1-Urlaub', 'Team A1', $assistants, $assistants, true, $settings);
-$mappedTeam = Team::get($ebTeam->toApiArray());
+$mappedTeam = Team::get($ebTeam->toArray());
 $checkSame('Team A1', $mappedTeam->toArray()['displayName'], 'Team::get should keep the API payload shape.');
 
 $store = new FakeShiftPlanStoreForSchedule();

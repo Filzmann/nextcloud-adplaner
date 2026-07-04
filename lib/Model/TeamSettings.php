@@ -22,7 +22,7 @@ class TeamSettings {
         );
     }
 
-    public function toApiArray(): array {
+    public function toArray(): array {
         return [
             'displayName' => $this->displayName,
             'config' => $this->config,

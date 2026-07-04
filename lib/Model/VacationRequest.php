@@ -32,7 +32,7 @@ class VacationRequest {
         return self::fromArray($row);
     }
 
-    public function toApiArray(): array {
+    public function toArray(): array {
         return [
             'id' => $this->id,
             'assistantUid' => $this->assistantUid,
