@@ -24,6 +24,9 @@ use OCA\AdPlaner\Store\ShiftPlanStore;
 
 class FakeShiftPlanStoreForSchedule extends ShiftPlanStore {
     public array $added = [];
+    public array $slots = [];
+    public array $updatedSlots = [];
+    public array $insertedSlots = [];
 
     public function __construct() {
     }
@@ -37,6 +40,10 @@ class FakeShiftPlanStoreForSchedule extends ShiftPlanStore {
     }
 
     public function slotsForMonth(string $teamCode, string $month): array {
+        if ($this->slots !== []) {
+            return $this->slots;
+        }
+
         return [
             new ShiftSlot(1, $teamCode, $month, $month . '-01', 'early', 'Frueh', '08:00', '14:00', true),
         ];
@@ -56,6 +63,18 @@ class FakeShiftPlanStoreForSchedule extends ShiftPlanStore {
     }
 
     public function updateSlotDefinition(int $slotId, string $label, string $startsAt, string $endsAt, bool $enabled): void {
+        $this->updatedSlots[] = compact('slotId', 'label', 'startsAt', 'endsAt', 'enabled');
+
+        foreach ($this->slots as $slot) {
+            if ($slot->id !== $slotId) {
+                continue;
+            }
+
+            $slot->label = $label;
+            $slot->startsAt = $startsAt;
+            $slot->endsAt = $endsAt;
+            $slot->enabled = $enabled;
+        }
     }
 
     public function insertSlot(
@@ -68,7 +87,24 @@ class FakeShiftPlanStoreForSchedule extends ShiftPlanStore {
         string $endsAt,
         bool $enabled
     ): int {
-        return 99;
+        $id = 99 + count($this->insertedSlots);
+        $this->insertedSlots[] = compact(
+            'id',
+            'teamCode',
+            'month',
+            'workDate',
+            'segmentKey',
+            'label',
+            'startsAt',
+            'endsAt',
+            'enabled'
+        );
+
+        if ($this->slots !== []) {
+            $this->slots[] = new ShiftSlot($id, $teamCode, $month, $workDate, $segmentKey, $label, $startsAt, $endsAt, $enabled);
+        }
+
+        return $id;
     }
 }
 
@@ -143,5 +179,30 @@ $checkThrows(
 $plan = $service->monthPlan($ebTeam, '2026-07', 'test-eb');
 $slotCandidates = $plan['days'][0]['slots'][0]['candidates'] ?? [];
 $checkSame(['assistant-a'], array_column($slotCandidates, 'uid'), 'Month plan should hide non-assignable EB candidates.');
+
+$configuredStore = new FakeShiftPlanStoreForSchedule();
+$configuredStore->slots = [
+    new ShiftSlot(10, 'A1', '2026-07', '2026-07-01', 'early', 'Altfrueh', '07:00', '13:00', true),
+    new ShiftSlot(11, 'A1', '2026-07', '2026-07-01', 'obsolete', 'Alt', '00:00', '01:00', true),
+];
+$configuredTeam = new Team('A1', 'ad-ASN-A1', 'ad-ASN-A1-Urlaub', 'Team A1', $assistants, $assistants, true, [
+    'shifts' => [
+        ['key' => 'early', 'label' => 'Frueh neu', 'startsAt' => '08:00', 'endsAt' => '14:00', 'enabled' => true],
+        ['key' => 'late', 'label' => 'Spaet', 'startsAt' => '14:00', 'endsAt' => '20:00', 'enabled' => true],
+        ['key' => 'night', 'label' => 'Nacht', 'startsAt' => '20:00', 'endsAt' => '08:00', 'enabled' => false],
+    ],
+]);
+$configuredService = new ScheduleService($configuredStore, new ShiftConfigService(), new FakeTeamAccessServiceForSchedule());
+$configuredPlan = $configuredService->monthPlan($configuredTeam, '2026-07', 'test-eb');
+$updatesById = [];
+foreach ($configuredStore->updatedSlots as $updatedSlot) {
+    $updatesById[$updatedSlot['slotId']] = $updatedSlot;
+}
+
+$checkSame('Frueh neu', $updatesById[10]['label'] ?? null, 'Existing slots should be updated to the current shift label.');
+$checkSame(false, $updatesById[11]['enabled'] ?? null, 'Slots for removed shift segments should be disabled.');
+$checkSame('late', $configuredStore->insertedSlots[0]['segmentKey'] ?? null, 'Missing enabled segments should be inserted for the first day.');
+$checkSame(false, in_array('night', array_column($configuredStore->insertedSlots, 'segmentKey'), true), 'Disabled shift segments should not be inserted.');
+$checkSame('Frueh neu', $configuredPlan['days'][0]['slots'][0]['label'] ?? null, 'Month plan should use refreshed slot definitions.');
 
 echo 'AdPlaner schedule smoke tests passed' . PHP_EOL;
