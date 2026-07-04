@@ -17,7 +17,7 @@ class Assistant {
     ) {
     }
 
-    public static function fromArray(array $assistant): self {
+    protected static function fromArray(array $assistant): self {
         return new self(
             (string)($assistant['uid'] ?? ''),
             (string)($assistant['displayName'] ?? ($assistant['uid'] ?? '')),

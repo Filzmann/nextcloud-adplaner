@@ -117,7 +117,7 @@ class TeamAccessService {
     public function assistantLabelMap(array $assistants): array {
         $map = [];
         foreach ($assistants as $assistant) {
-            $assistant = $assistant instanceof Assistant ? $assistant : Assistant::fromArray((array)$assistant);
+            $assistant = $assistant instanceof Assistant ? $assistant : Assistant::get((array)$assistant);
             $map[$assistant->uid] = $assistant->displayName;
         }
 

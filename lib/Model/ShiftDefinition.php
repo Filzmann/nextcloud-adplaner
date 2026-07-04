@@ -18,7 +18,7 @@ class ShiftDefinition {
     ) {
     }
 
-    public static function fromArray(array $shift): self {
+    protected static function fromArray(array $shift): self {
         return new self(
             (string)($shift['key'] ?? ''),
             (string)($shift['label'] ?? ''),

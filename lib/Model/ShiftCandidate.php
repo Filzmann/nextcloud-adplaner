@@ -20,7 +20,7 @@ class ShiftCandidate {
     ) {
     }
 
-    public static function fromArray(array $data): self {
+    protected static function fromArray(array $data): self {
         return new self(
             (int)($data['id'] ?? 0),
             (int)($data['slotId'] ?? $data['slot_id'] ?? 0),
@@ -30,10 +30,6 @@ class ShiftCandidate {
             (string)($data['displayName'] ?? $data['display_name'] ?? ''),
             (bool)($data['isSelf'] ?? $data['is_self'] ?? false)
         );
-    }
-
-    public static function fromRow(array $row): self {
-        return self::fromArray($row);
     }
 
     public function toArray(array $assistantLabels = [], string $currentUid = ''): array {

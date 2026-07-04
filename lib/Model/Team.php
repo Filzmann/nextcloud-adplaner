@@ -23,7 +23,7 @@ class Team {
         $this->vacationAssistants = $this->normalizeAssistants($this->vacationAssistants);
     }
 
-    public static function fromArray(array $data): self {
+    protected static function fromArray(array $data): self {
         return new self(
             (string)($data['code'] ?? ''),
             (string)($data['groupName'] ?? $data['group_name'] ?? ''),
@@ -116,7 +116,7 @@ class Team {
                 return $assistant;
             }
 
-            return Assistant::fromArray((array)$assistant);
+            return Assistant::get((array)$assistant);
         }, $assistants);
     }
 }

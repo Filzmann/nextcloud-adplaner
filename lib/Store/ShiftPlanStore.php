@@ -16,16 +16,13 @@ class ShiftPlanStore {
     }
 
     public function slotsForMonth(string $teamCode, string $month): array {
-        return array_map(
-            static fn(array $row): ShiftSlot => ShiftSlot::fromRow($row),
-            $this->repository->findSlotsForMonth($teamCode, $month)
-        );
+        return ShiftSlot::get_all($this->repository->findSlotsForMonth($teamCode, $month));
     }
 
     public function slotForMonth(int $slotId, string $teamCode, string $month): ?ShiftSlot {
         $row = $this->repository->findSlot($slotId, $teamCode, $month);
 
-        return $row === null ? null : ShiftSlot::fromRow($row);
+        return ShiftSlot::get($row);
     }
 
     public function candidatesForSlotIds(array $slotIds): array {
@@ -33,10 +30,7 @@ class ShiftPlanStore {
         $candidatesBySlot = [];
 
         foreach ($rowsBySlot as $slotId => $rows) {
-            $candidatesBySlot[(int)$slotId] = array_map(
-                static fn(array $row): ShiftCandidate => ShiftCandidate::fromRow($row),
-                $rows
-            );
+            $candidatesBySlot[(int)$slotId] = ShiftCandidate::get_all($rows);
         }
 
         return $candidatesBySlot;

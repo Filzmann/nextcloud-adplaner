@@ -23,7 +23,7 @@ class ShiftSlot {
     ) {
     }
 
-    public static function fromArray(array $data): self {
+    protected static function fromArray(array $data): self {
         return new self(
             (int)($data['id'] ?? 0),
             (string)($data['teamCode'] ?? $data['team_code'] ?? ''),
@@ -36,12 +36,6 @@ class ShiftSlot {
             (bool)($data['enabled'] ?? true),
             ShiftCandidate::get_all(is_array($data['candidates'] ?? null) ? $data['candidates'] : [])
         );
-    }
-
-    public static function fromRow(array $row, array $candidates = []): self {
-        $row['candidates'] = $candidates;
-
-        return self::fromArray($row);
     }
 
     public function toArray(): array {

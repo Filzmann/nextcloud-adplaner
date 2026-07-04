@@ -14,22 +14,19 @@ class VacationStore {
     }
 
     public function forUsersInYear(array $assistantUids, int $year): array {
-        return array_map(
-            static fn(array $row): VacationRequest => VacationRequest::fromRow($row),
-            $this->repository->findForUsersInYear($assistantUids, $year)
-        );
+        return VacationRequest::get_all($this->repository->findForUsersInYear($assistantUids, $year));
     }
 
     public function findById(int $requestId): ?VacationRequest {
         $row = $this->repository->findById($requestId);
 
-        return $row === null ? null : VacationRequest::fromRow($row);
+        return VacationRequest::get($row);
     }
 
     public function findCoveringDate(string $assistantUid, string $date): ?VacationRequest {
         $row = $this->repository->findCoveringDate($assistantUid, $date);
 
-        return $row === null ? null : VacationRequest::fromRow($row);
+        return VacationRequest::get($row);
     }
 
     public function create(string $assistantUid, string $dateFrom, string $dateTo, string $note, string $status = 'planned', ?string $updatedByUid = null): int {

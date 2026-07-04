@@ -19,7 +19,7 @@ class VacationRequest {
     ) {
     }
 
-    public static function fromArray(array $data): self {
+    protected static function fromArray(array $data): self {
         return new self(
             (int)($data['id'] ?? 0),
             (string)($data['assistantUid'] ?? $data['assistant_uid'] ?? ''),
@@ -28,10 +28,6 @@ class VacationRequest {
             (string)($data['status'] ?? ''),
             (string)($data['note'] ?? '')
         );
-    }
-
-    public static function fromRow(array $row): self {
-        return self::fromArray($row);
     }
 
     public function toArray(): array {

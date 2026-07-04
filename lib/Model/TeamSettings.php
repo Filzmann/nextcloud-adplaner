@@ -16,7 +16,7 @@ class TeamSettings {
     ) {
     }
 
-    public static function fromArray(array $data): self {
+    protected static function fromArray(array $data): self {
         return new self(
             (string)($data['teamCode'] ?? $data['team_code'] ?? ''),
             (string)($data['displayName'] ?? $data['display_name'] ?? ''),

@@ -18,7 +18,7 @@ class DayNote {
     ) {
     }
 
-    public static function fromArray(array $data): self {
+    protected static function fromArray(array $data): self {
         return new self(
             (string)($data['teamCode'] ?? $data['team_code'] ?? ''),
             (string)($data['workDate'] ?? $data['work_date'] ?? ''),
@@ -26,10 +26,6 @@ class DayNote {
             (string)($data['updatedByUid'] ?? $data['updated_by_uid'] ?? ''),
             (string)($data['updatedAt'] ?? $data['updated_at'] ?? '')
         );
-    }
-
-    public static function fromRow(array $row): self {
-        return self::fromArray($row);
     }
 
     public function toArray(): array {
