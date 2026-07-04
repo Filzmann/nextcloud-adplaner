@@ -102,3 +102,11 @@ Diese Regeln gelten sinngemaess auch fuer andere eigene Nextcloud-Apps; die fach
 - App-spezifische Learnings werden in diesem App-Repo gespeichert.
 - App-uebergreifende Learnings werden im Parent-Workspace dokumentiert und bei Bedarf in die App-`AGENTS.md` uebertragen.
 - Neue Regeln muessen dort stehen, wo sie gebraucht werden: AdPlaner-Fachlogik hier, DDEV-/Repo-/Neue-App-Regeln im Parent bzw. in allen betroffenen App-Repos.
+
+## Tests
+
+Wichtige lokale Pruefungen:
+
+    find js -name '*.js' -print0 | xargs -0 -n1 node --check
+    node tests/js/model-smoke.js
+    for f in tests/Service/*.php; do php "$f"; done
