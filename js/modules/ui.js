@@ -1,5 +1,5 @@
 (function() {
-    const { Notice, byId, esc } = window.LocalBase.ui;
+    const { Notice, byId, esc, errorMessage } = window.LocalBase.ui;
     const notice = new Notice('adp-notice');
     const weekday = ['', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
     const monthName = ['', 'Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
@@ -35,6 +35,10 @@
         notice.show(message);
     }
 
+    function showError(error, fallback = 'Die Aktion konnte nicht ausgefuehrt werden.') {
+        notice.show(errorMessage(error, fallback));
+    }
+
     window.ADPlaner = window.ADPlaner || {};
-    window.ADPlaner.ui = { byId, esc, dateShort, dayHeader, monthHeader, statusLabel, showNotice };
+    window.ADPlaner.ui = { byId, esc, dateShort, dayHeader, monthHeader, statusLabel, showNotice, showError };
 })();

@@ -1,5 +1,5 @@
 (function() {
-    const { byId, esc, showNotice } = window.ADPlaner.ui;
+    const { byId, esc, showNotice, showError } = window.ADPlaner.ui;
     const { render: renderMonthPlan } = window.ADPlaner.monthPlan;
     const { render: renderVacationPlan } = window.ADPlaner.vacationPlan;
     const { render: renderSettingsPanel } = window.ADPlaner.settingsPanel;
@@ -45,7 +45,7 @@
                 renderPanel();
             }
         } catch (e) {
-            showNotice(e.message);
+            showError(e, 'Dienstplanung konnte nicht geladen werden.');
         }
     }
 
@@ -106,7 +106,7 @@
                 await loadMonth();
             }
         } catch (e) {
-            showNotice(e.message);
+            showError(e, 'Ansicht konnte nicht geladen werden.');
         } finally {
             state.loading = false;
             renderChrome();
@@ -190,7 +190,7 @@
                 await loadVacation();
             }
         } catch (e) {
-            showNotice(e.message);
+            showError(e, 'Aktion konnte nicht ausgefuehrt werden.');
         } finally {
             renderPanel();
         }
@@ -215,7 +215,7 @@
                 await loadVacation();
                 renderPanel();
             } catch (e) {
-                showNotice(e.message);
+                showError(e, 'Urlaub konnte nicht gespeichert werden.');
             }
         });
     }
@@ -247,7 +247,7 @@
                 renderChrome();
                 renderPanel();
             } catch (e) {
-                showNotice(e.message);
+                showError(e, 'Einstellungen konnten nicht gespeichert werden.');
             }
         });
     }
