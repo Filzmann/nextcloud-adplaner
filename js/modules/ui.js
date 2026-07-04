@@ -1,20 +1,7 @@
 (function() {
+    const { byId, esc } = window.LocalBase.ui;
     const weekday = ['', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
     const monthName = ['', 'Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
-
-    function byId(id) {
-        return document.getElementById(id);
-    }
-
-    function esc(value) {
-        return String(value ?? '').replace(/[&<>"']/g, char => ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        })[char]);
-    }
 
     function dateShort(date) {
         const parts = String(date).split('-');
