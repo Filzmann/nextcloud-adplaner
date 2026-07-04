@@ -1,13 +1,10 @@
 (function() {
+    const { Repository } = window.LocalBase.repositories;
     const { ShiftDefinition, ShiftSlot, Team, VacationRequest } = window.ADPlaner.models;
 
-    class PlanRepository {
-        constructor(api) {
-            this.api = api;
-        }
-
+    class PlanRepository extends Repository {
         async state() {
-            const data = await this.api.request('/api/state');
+            const data = await this.request('/api/state');
 
             return {
                 ...data,
@@ -16,11 +13,11 @@
         }
 
         async monthPlan(teamCode, month) {
-            return this.hydrateMonthPlan(await this.api.request(this.teamPath(teamCode) + '/months/' + this.encode(month)));
+            return this.hydrateMonthPlan(await this.request(this.teamPath(teamCode) + '/months/' + this.encode(month)));
         }
 
         async vacationPlan(teamCode, year) {
-            return this.hydrateVacationPlan(await this.api.request(this.teamPath(teamCode) + '/vacations/' + this.encode(year)));
+            return this.hydrateVacationPlan(await this.request(this.teamPath(teamCode) + '/vacations/' + this.encode(year)));
         }
 
         addSelf(teamCode, month, slotId) {
@@ -69,13 +66,6 @@
             });
         }
 
-        post(url, body = {}) {
-            return this.api.request(url, {
-                method: 'POST',
-                body: JSON.stringify(body)
-            });
-        }
-
         teamPath(teamCode) {
             return '/api/teams/' + this.encode(teamCode);
         }
@@ -108,9 +98,6 @@
             };
         }
 
-        encode(value) {
-            return this.api.encode ? this.api.encode(value) : encodeURIComponent(String(value));
-        }
     }
 
     window.ADPlaner = window.ADPlaner || {};

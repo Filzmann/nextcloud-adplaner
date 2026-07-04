@@ -30,6 +30,7 @@ require('../../js/models/team-settings.js');
 require('../../js/models/team.js');
 require('../../js/models/vacation-request.js');
 require('../../js/models/day-note.js');
+require('../../../localbase/js/repositories/repository.js');
 
 window.ADPlaner.api = {
     request(path, options = {}) {
