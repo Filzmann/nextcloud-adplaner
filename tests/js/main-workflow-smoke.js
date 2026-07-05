@@ -1,66 +1,19 @@
 const assert = require('assert');
+const {
+    FakeButton,
+    FakeElement,
+    createElementMap,
+} = require('../../../localbase/tests/js/helpers/fake-dom.js');
 
-class FakeClassList {
-    constructor() {
-        this.values = new Set();
-    }
-
-    toggle(name, enabled) {
-        if (enabled) {
-            this.values.add(name);
-            return;
-        }
-
-        this.values.delete(name);
-    }
-
-    has(name) {
-        return this.values.has(name);
-    }
-}
-
-class FakeElement {
-    constructor(id = '') {
-        this.id = id;
-        this.value = '';
-        this.innerHTML = '';
-        this.disabled = false;
-        this.dataset = {};
-        this.listeners = {};
-        this.classList = new FakeClassList();
-    }
-
-    addEventListener(type, listener) {
-        this.listeners[type] = listener;
-    }
-
-    closest(selector) {
-        if (selector === 'button[data-action]' && this.dataset.action) {
-            return this;
-        }
-        if (selector === 'button[data-view]' && this.dataset.view) {
-            return this;
-        }
-
-        return null;
-    }
-
-    querySelector(selector) {
-        return this.queryResults ? this.queryResults.get(selector) || null : null;
-    }
-}
-
-const elements = new Map([
-    ['team-select', new FakeElement('team-select')],
-    ['month-input', new FakeElement('month-input')],
-    ['year-input', new FakeElement('year-input')],
-    ['adp-panel', new FakeElement('adp-panel')]
+const elements = createElementMap([
+    'team-select',
+    'month-input',
+    'year-input',
+    'adp-panel',
 ]);
 const tabs = new FakeElement('tabs');
-const tabMonth = new FakeElement('tab-month');
-tabMonth.dataset.view = 'month';
-const tabVacation = new FakeElement('tab-vacation');
-tabVacation.dataset.view = 'vacation';
+const tabMonth = new FakeButton({ view: 'month' }, 'tab-month');
+const tabVacation = new FakeButton({ view: 'vacation' }, 'tab-vacation');
 
 const notices = [];
 const errors = [];
@@ -212,13 +165,11 @@ async function flush() {
     assert(elements.get('adp-panel').innerHTML.includes('TeamB:2026'));
 
     await elements.get('adp-panel').listeners.click({
-        target: Object.assign(new FakeElement(), {
-            dataset: {
-                action: 'set-vacation-status',
-                targetUid: 'anna',
-                date: '2026-07-02',
-                status: 'approved'
-            }
+        target: new FakeButton({
+            action: 'set-vacation-status',
+            targetUid: 'anna',
+            date: '2026-07-02',
+            status: 'approved'
         })
     });
     assert.deepStrictEqual(repositoryCalls.slice(-2), [
@@ -228,11 +179,9 @@ async function flush() {
 
     await tabs.listeners.click({ target: tabMonth });
     await elements.get('adp-panel').listeners.click({
-        target: Object.assign(new FakeElement(), {
-            dataset: {
-                action: 'add-self',
-                slotId: '7'
-            }
+        target: new FakeButton({
+            action: 'add-self',
+            slotId: '7'
         })
     });
     assert.deepStrictEqual(repositoryCalls.slice(-2), [
