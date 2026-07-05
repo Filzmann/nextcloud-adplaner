@@ -52,7 +52,10 @@ foreach ($lintFiles as $file) {
     run_test_command($root, ['php', '-l', relative_test_path($root, $file)]);
 }
 
-foreach (collect_php_files($root, ['tests/Service']) as $file) {
+foreach (array_merge(
+    collect_php_files($root, ['tests/Controller']),
+    collect_php_files($root, ['tests/Service'])
+) as $file) {
     if (!str_ends_with($file, 'SmokeTest.php')) {
         continue;
     }
