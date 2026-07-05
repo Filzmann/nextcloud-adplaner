@@ -4,22 +4,15 @@ declare(strict_types=1);
 
 namespace OCA\AdPlaner\Tests;
 
-function assertSameValue(mixed $expected, mixed $actual, string $message): void {
-    if ($expected === $actual) {
-        return;
-    }
+require_once __DIR__ . '/../../../localbase/tests/Support/assertions.php';
 
-    throw new \RuntimeException(
-        $message . ' Expected ' . var_export($expected, true) . ', got ' . var_export($actual, true)
-    );
+use function OCA\LocalBase\Tests\Support\assertSameValue as supportAssertSameValue;
+use function OCA\LocalBase\Tests\Support\assertThrows as supportAssertThrows;
+
+function assertSameValue(mixed $expected, mixed $actual, string $message): void {
+    supportAssertSameValue($expected, $actual, $message);
 }
 
 function assertDomainException(callable $callback, string $message): void {
-    try {
-        $callback();
-    } catch (\DomainException) {
-        return;
-    }
-
-    throw new \RuntimeException($message);
+    supportAssertThrows($callback, \DomainException::class, $message);
 }
