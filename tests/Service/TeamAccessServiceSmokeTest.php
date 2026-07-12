@@ -123,7 +123,7 @@ namespace {
         public function getUserGroupIds($user): array {
             $uid = $user->getUID();
             if ($uid === 'bob') {
-                return ['ad-ASN-TeamB', 'ad-EB-Team'];
+                return ['ad-ASN-TeamB', 'ad-EB'];
             }
             if ($uid === 'alice') {
                 return ['ad-ASN-TeamB', 'ad-ASN-Zulu', 'ignored', 'ad-ASN-TeamB'];

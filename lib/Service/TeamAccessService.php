@@ -169,7 +169,7 @@ class TeamAccessService {
         }
 
         foreach ($this->groupManager->getUserGroupIds($user) as $groupId) {
-            if (preg_match('/^ad-EB-.+$/', (string)$groupId)) {
+            if ((string)$groupId === 'ad-EB' || preg_match('/^ad-EB-.+$/', (string)$groupId)) {
                 return true;
             }
         }
