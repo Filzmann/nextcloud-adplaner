@@ -42,7 +42,7 @@ class ApiController extends Controller {
                 ),
                 'defaultMonth' => date('Y-m'),
                 'defaultYear' => (int)date('Y'),
-                'notice' => 'Prototyp: Assistenznehmer werden aus ad-ASN-<Kuerzel> gelesen; EB-Rechte aus zusaetzlicher ad-EB-*-Mitgliedschaft.',
+                'notice' => 'Assistenzteams werden aus ad-ASN-<Kuerzel> gelesen; EB-Rechte stammen aus der gemeinsamen Rollengruppe ad-EB.',
             ];
         }, [$this->logger, 'error'], 'state');
     }

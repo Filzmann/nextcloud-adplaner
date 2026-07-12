@@ -19,7 +19,7 @@ AdPlaner soll Dienstplanung und Urlaubsplanung in Assistenzteams abbilden.
 Kernprozess:
 
 - Assistenznehmer werden aus Nextcloud-Gruppen `ad-ASN-<Kuerzel>` abgeleitet.
-- EB-Rechte erhalten Nutzer*innen, die zugleich im Team und in der gemeinsamen Rollengruppe `ad-EB` sind; bestehende `ad-EB-*`-Gruppen bleiben uebergangsweise kompatibel.
+- EB-Rechte erhalten Nutzer*innen, die zugleich im Team und in der app-uebergreifend gemeinsamen Rollengruppe `ad-EB` sind.
 - Monatliche Wunschplaene werden je Assistenzteam erstellt.
 - Die Schichtliste ist variabel konfigurierbar; Standard ist 08-14, 14-20 und 20-08.
 - Luecken und Ueberlappungen in Schichtdefinitionen sind moeglich und duerfen nicht vorschnell wegvalidiert werden.
@@ -73,7 +73,7 @@ Gruppenschema fuer `adplaner`:
 - Assistenznehmer-Gruppen: `ad-ASN-<Kuerzel>`, zum Beispiel `ad-ASN-TeamB`, `ad-ASN-TeamA`, `ad-ASN-TeamC`.
 - `<Kuerzel>` ist das Kuerzel eines Assistenznehmers und darf Unicode-Buchstaben sowie Ziffern enthalten.
 - Optionale Urlaubssichtbarkeitsgruppe: `ad-ASN-<Kuerzel>-Urlaub`.
-- EB-Rechte: Nutzer*innen, die zugleich in der Assistenznehmer-Gruppe und der gemeinsamen Rollengruppe `ad-EB` sind. Bestehende Gruppen nach `ad-EB-*` werden waehrend des Uebergangs weiterhin akzeptiert.
+- EB-Rechte: Nutzer*innen, die zugleich in der Assistenznehmer-Gruppe und der gemeinsamen Rollengruppe `ad-EB` sind. Rollen-/Bereichskombinationen werden nicht als eigene Gruppen akzeptiert.
 - Bereichszuordnungen werden app-uebergreifend separat als `ad-Bereich-<Name>` gepflegt; kombinierte Rollen-/Bereichsgruppen werden dynamisch abgeleitet.
 
 ## Architekturregeln

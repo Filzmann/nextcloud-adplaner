@@ -86,6 +86,12 @@ namespace {
             return $this->email;
         }
     };
+    $legacyEb = new class('legacy-eb', 'Legacy EB', '') {
+        public function __construct(private string $uid, private string $displayName, private string $email) {}
+        public function getUID(): string { return $this->uid; }
+        public function getDisplayName(): string { return $this->displayName; }
+        public function getEMailAddress(): string { return $this->email; }
+    };
 
     $teamGroup = new class([$alice, $bob]) {
         public function __construct(private array $users) {
@@ -127,6 +133,9 @@ namespace {
             }
             if ($uid === 'alice') {
                 return ['ad-ASN-TeamB', 'ad-ASN-Zulu', 'ignored', 'ad-ASN-TeamB'];
+            }
+            if ($uid === 'legacy-eb') {
+                return ['ad-ASN-TeamB', 'ad-EB-Altschema'];
             }
 
             return [];
@@ -188,6 +197,9 @@ namespace {
         static fn() => $service->assertCanCoordinate('TeamB'),
         'Non-EB users should not coordinate team settings.'
     );
+
+    $session->setUser($legacyEb);
+    assertSameValue(false, $service->currentUserIsEbForTeam('TeamB'), 'Legacy ad-EB-* groups must not grant EB rights.');
 
     $session->setUser(null);
     assertSameValue([], $service->teamsForCurrentUser(), 'Anonymous sessions should not expose teams.');

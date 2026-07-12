@@ -10,6 +10,8 @@ use OCP\IGroupManager;
 use OCP\IUserSession;
 
 class TeamAccessService {
+    public const ROLE_EB = 'ad-EB';
+
     public function __construct(
         private IGroupManager $groupManager,
         private IUserSession $userSession,
@@ -168,13 +170,7 @@ class TeamAccessService {
             return false;
         }
 
-        foreach ($this->groupManager->getUserGroupIds($user) as $groupId) {
-            if ((string)$groupId === 'ad-EB' || preg_match('/^ad-EB-.+$/', (string)$groupId)) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array(self::ROLE_EB, array_map('strval', $this->groupManager->getUserGroupIds($user)), true);
     }
 
     private function teamGroupName(string $teamCode): string {

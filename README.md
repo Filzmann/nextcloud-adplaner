@@ -9,7 +9,7 @@ Development-Prototyp. Nicht produktiv und nicht rechtssicher.
 Enthalten:
 
 - Assistenznehmer aus Nextcloud-Gruppen `ad-ASN-<Kuerzel>`, zum Beispiel `ad-ASN-TeamB`, `ad-ASN-TeamA` oder `ad-ASN-TeamC`.
-- EB-Recht fuer Nutzer*innen, die zugleich im Team und in einer Gruppe `ad-EB-*` sind.
+- EB-Recht fuer Nutzer*innen, die zugleich im Team und in der gemeinsamen Rollengruppe `ad-EB` sind.
 - Monatlicher Wunschplan mit variabler Schichtliste; Standard ist 08-14, 14-20 und 20-08, Luecken und Ueberlappungen sind moeglich.
 - Zuweisungen je Schicht: eigene Eintraege durch Assistenz, fremde Zuweisungen nur durch EB; EB-Konten selbst sind nicht schichtfaehig.
 - Jahres-Urlaubsplan mit allen Tagen als Spalten und Assistenzkraeften als Zeilen.
