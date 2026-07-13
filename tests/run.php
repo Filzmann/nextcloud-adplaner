@@ -54,7 +54,8 @@ foreach ($lintFiles as $file) {
 
 foreach (array_merge(
     collect_php_files($root, ['tests/Controller']),
-    collect_php_files($root, ['tests/Service'])
+    collect_php_files($root, ['tests/Service']),
+    collect_php_files($root, ['tests/Ui'])
 ) as $file) {
     if (!str_ends_with($file, 'SmokeTest.php')) {
         continue;

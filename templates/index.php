@@ -2,6 +2,7 @@
 script('localbase', 'api/api-client');
 script('adplaner', 'modules/api');
 script('localbase', 'ui/ui');
+script('orgsuite', 'suite-navigation');
 script('adplaner', 'modules/ui');
 script('localbase', 'models/model');
 script('adplaner', 'models/assistant');
@@ -21,9 +22,11 @@ script('adplaner', 'components/month-plan');
 script('adplaner', 'components/settings-panel');
 script('adplaner', 'main');
 style('adplaner', 'style');
+style('orgsuite', 'suite-navigation');
 ?>
 
 <div id="adplaner-app">
+    <div class="orgsuite-host" data-orgsuite data-suite="ad" data-current-app="adplaner"></div>
     <header class="adp-head">
         <h1>Assistenzplanung</h1>
         <div class="adp-controls">
