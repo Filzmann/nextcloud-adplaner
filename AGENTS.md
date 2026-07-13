@@ -25,8 +25,8 @@ Kernprozess:
 - Luecken und Ueberlappungen in Schichtdefinitionen sind moeglich und duerfen nicht vorschnell wegvalidiert werden.
 - Zuweisungen je Schicht folgen der Rollenlogik: eigene Eintraege durch Assistenz, fremde Zuweisungen nur durch EB.
 - EB-Konten selbst sind nicht schichtfaehig.
-- Jahres-Urlaubsplanung zeigt alle Tage als Spalten und Assistenzkraefte als Zeilen.
-- Urlaubswuensche sind globale Eintraege pro Assistenz und in allen Teams der Person sichtbar.
+- Jahres-Urlaubsplanung zeigt alle Tage als Spalten und Assistenzkraefte als Zeilen. Sie verwendet die kanonische API und Persistenz der separaten App `adurlaub`.
+- Urlaubswuensche sind globale Eintraege pro Person und in allen Teams der Person sichtbar; `adp_vacation_requests` bleibt nur als temporaere Rueckbaureserve und darf nicht mehr ueber aktive AdPlaner-Routen beschrieben werden.
 - Optionale Urlaubssichtbarkeit laeuft ueber `ad-ASN-<Kuerzel>-Urlaub`; ohne diese Gruppe wird die Assistenznehmer-Gruppe selbst verwendet.
 - Statuswechsel wie `planned` und `approved` erfolgen nur durch EB.
 
@@ -75,6 +75,7 @@ Gruppenschema fuer `adplaner`:
 - Optionale Urlaubssichtbarkeitsgruppe: `ad-ASN-<Kuerzel>-Urlaub`.
 - EB-Rechte: Nutzer*innen, die zugleich in der Assistenznehmer-Gruppe und der gemeinsamen Rollengruppe `ad-EB` sind. Rollen-/Bereichskombinationen werden nicht als eigene Gruppen akzeptiert.
 - Bereichszuordnungen werden app-uebergreifend separat als `ad-Bereich-<Name>` gepflegt; kombinierte Rollen-/Bereichsgruppen werden dynamisch abgeleitet.
+- Die Urlaubssicht ist Teil des gemeinsamen Teamkatalogs aus ASN-Teams, Büro NOW/Süd, PFK und Stab; AdPlaner öffnet daraus jeweils die zum gewählten ASN-Team passende Sicht.
 
 ## Architekturregeln
 

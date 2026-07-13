@@ -11,9 +11,6 @@ return [
         ['name' => 'api#addShiftCandidate', 'url' => '/api/teams/{teamCode}/months/{month}/slots/{slotId}/candidates', 'verb' => 'POST'],
         ['name' => 'api#removeShiftCandidate', 'url' => '/api/teams/{teamCode}/months/{month}/slots/{slotId}/candidates/remove', 'verb' => 'POST'],
 
-        ['name' => 'api#yearVacation', 'url' => '/api/teams/{teamCode}/vacations/{year}', 'verb' => 'GET'],
-        ['name' => 'api#createVacationRequest', 'url' => '/api/vacations', 'verb' => 'POST'],
-        ['name' => 'api#deleteVacationRequest', 'url' => '/api/vacations/{requestId}/delete', 'verb' => 'POST'],
-        ['name' => 'api#setVacationStatus', 'url' => '/api/teams/{teamCode}/vacations/{year}/status', 'verb' => 'POST'],
+        // Urlaubsrouten liegen kanonisch in AD Urlaub; die alten Services bleiben vorerst nur als Rueckbaureserve bestehen.
     ],
 ];

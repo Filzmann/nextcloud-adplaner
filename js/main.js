@@ -207,6 +207,7 @@
             const data = new FormData(form);
             try {
                 await repository.createVacation(
+                    state.currentUser.uid,
                     data.get('dateFrom') || '',
                     data.get('dateTo') || '',
                     data.get('note') || ''
