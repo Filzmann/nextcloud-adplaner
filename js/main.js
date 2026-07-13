@@ -1,7 +1,6 @@
 (function() {
     const { byId, esc, showNotice, showError } = window.ADPlaner.ui;
     const { render: renderMonthPlan } = window.ADPlaner.monthPlan;
-    const { render: renderVacationPlan } = window.ADPlaner.vacationPlan;
     const { render: renderSettingsPanel } = window.ADPlaner.settingsPanel;
     const { PlanRepository } = window.ADPlaner.repositories;
     const {
@@ -17,10 +16,8 @@
         teams: [],
         selectedTeamCode: '',
         month: '',
-        year: '',
         activeView: 'month',
         monthPlan: null,
-        vacationPlan: null,
         loading: false
     };
 
@@ -34,7 +31,6 @@
             state.currentUser = data.currentUser || null;
             state.teams = data.teams || [];
             state.month = data.defaultMonth || new Date().toISOString().slice(0, 7);
-            state.year = String(data.defaultYear || new Date().getFullYear());
             state.selectedTeamCode = state.teams.length ? state.teams[0].code : '';
 
             renderChrome();
@@ -58,8 +54,6 @@
         teamSelect.disabled = state.teams.length === 0;
 
         byId('month-input').value = state.month;
-        byId('year-input').value = state.year;
-
         document.querySelectorAll('.adp-tab').forEach(button => {
             button.classList.toggle('is-active', button.dataset.view === state.activeView);
         });
@@ -74,12 +68,6 @@
 
         if (!state.selectedTeamCode) {
             panel.innerHTML = '<p>Keine Assistenznehmer-Gruppen.</p>';
-            return;
-        }
-
-        if (state.activeView === 'vacation') {
-            panel.innerHTML = renderVacationPlan(state.vacationPlan, state.currentUser);
-            bindVacationForm();
             return;
         }
 
@@ -98,9 +86,7 @@
         showNotice('');
 
         try {
-            if (state.activeView === 'vacation') {
-                await loadVacation();
-            } else if (state.activeView === 'settings') {
+            if (state.activeView === 'settings') {
                 await refreshState();
             } else {
                 await loadMonth();
@@ -126,12 +112,6 @@
     async function loadMonth() {
         state.monthPlan = await repository.monthPlan(state.selectedTeamCode, state.month);
         const updatedTeam = state.monthPlan.team;
-        state.teams = state.teams.map(team => team.code === updatedTeam.code ? updatedTeam : team);
-    }
-
-    async function loadVacation() {
-        state.vacationPlan = await repository.vacationPlan(state.selectedTeamCode, state.year);
-        const updatedTeam = state.vacationPlan.team;
         state.teams = state.teams.map(team => team.code === updatedTeam.code ? updatedTeam : team);
     }
 
@@ -176,49 +156,12 @@
                 const textarea = byId('adp-panel').querySelector(`textarea[data-note-date="${CSS.escape(button.dataset.date)}"]`);
                 await repository.saveDayNote(state.selectedTeamCode, state.month, button.dataset.date, textarea ? textarea.value : '');
                 await loadMonth();
-            } else if (action === 'delete-vacation') {
-                await repository.deleteVacation(button.dataset.requestId);
-                await loadVacation();
-            } else if (action === 'set-vacation-status') {
-                await repository.setVacationStatus(
-                    state.selectedTeamCode,
-                    state.year,
-                    button.dataset.targetUid || '',
-                    button.dataset.date || '',
-                    button.dataset.status || 'planned'
-                );
-                await loadVacation();
             }
         } catch (e) {
             showError(e, 'Aktion konnte nicht ausgefuehrt werden.');
         } finally {
             renderPanel();
         }
-    }
-
-    function bindVacationForm() {
-        const form = byId('vacation-form');
-        if (!form) {
-            return;
-        }
-
-        form.addEventListener('submit', async event => {
-            event.preventDefault();
-            const data = new FormData(form);
-            try {
-                await repository.createVacation(
-                    state.currentUser.uid,
-                    data.get('dateFrom') || '',
-                    data.get('dateTo') || '',
-                    data.get('note') || ''
-                );
-                form.reset();
-                await loadVacation();
-                renderPanel();
-            } catch (e) {
-                showError(e, 'Urlaub konnte nicht gespeichert werden.');
-            }
-        });
     }
 
     function bindSettingsForm() {
@@ -256,20 +199,12 @@
     byId('team-select').addEventListener('change', async event => {
         state.selectedTeamCode = event.target.value;
         state.monthPlan = null;
-        state.vacationPlan = null;
         await reloadActive();
     });
 
     byId('month-input').addEventListener('change', async event => {
         state.month = event.target.value;
         if (state.activeView === 'month') {
-            await reloadActive();
-        }
-    });
-
-    byId('year-input').addEventListener('change', async event => {
-        state.year = event.target.value;
-        if (state.activeView === 'vacation') {
             await reloadActive();
         }
     });

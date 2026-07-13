@@ -66,26 +66,6 @@ namespace {
             return $this->email;
         }
     };
-    $zoe = new class('zoe', 'Zoe Urlaub', '') {
-        public function __construct(
-            private string $uid,
-            private string $displayName,
-            private string $email
-        ) {
-        }
-
-        public function getUID(): string {
-            return $this->uid;
-        }
-
-        public function getDisplayName(): string {
-            return $this->displayName;
-        }
-
-        public function getEMailAddress(): string {
-            return $this->email;
-        }
-    };
     $legacyEb = new class('legacy-eb', 'Legacy EB', '') {
         public function __construct(private string $uid, private string $displayName, private string $email) {}
         public function getUID(): string { return $this->uid; }
@@ -101,19 +81,9 @@ namespace {
             return $this->users;
         }
     };
-    $vacationGroup = new class([$zoe, $alice]) {
-        public function __construct(private array $users) {
-        }
-
-        public function getUsers(): array {
-            return $this->users;
-        }
-    };
-
-    $groupManager = new class($teamGroup, $vacationGroup, $bob) implements IGroupManager {
+    $groupManager = new class($teamGroup, $bob) implements IGroupManager {
         public function __construct(
             private object $teamGroup,
-            private object $vacationGroup,
             private object $currentUser
         ) {
         }
@@ -121,7 +91,6 @@ namespace {
         public function get($gid): ?object {
             return match ((string)$gid) {
                 'ad-ASN-TeamB' => $this->teamGroup,
-                'ad-ASN-TeamB-Urlaub' => $this->vacationGroup,
                 default => null,
             };
         }
@@ -173,18 +142,12 @@ namespace {
     $team = $service->teamForCode('TeamB');
     assertSameValue('Team B', $team->displayName, 'Team display name should come from team settings.');
     assertSameValue('ad-ASN-TeamB', $team->groupName, 'Team group name should follow the AD schema.');
-    assertSameValue('ad-ASN-TeamB-Urlaub', $team->vacationGroupName, 'Vacation group name should follow the AD schema.');
     assertSameValue(['Alice Assistenz', 'Bob EB'], array_map(static fn($assistant): string => $assistant->displayName, $team->assistants()), 'Assistants should be sorted by display name.');
-    assertSameValue(['Alice Assistenz', 'Zoe Urlaub'], array_map(static fn($assistant): string => $assistant->displayName, $team->vacationAssistants()), 'Vacation assistants should use the optional vacation group when present.');
     assertSameValue(false, $team->assistantByUid('bob')->canReceiveShifts, 'EB users should not receive shifts.');
     assertSameValue(['alice' => 'Alice Assistenz', 'bob' => 'Bob EB'], $service->assistantLabelMap($team->assistants()), 'Assistant label maps should expose display names by uid.');
 
     $service->assertCanCoordinate('TeamB');
     $service->assertAssistantInTeam('TeamB', 'alice');
-    assertDomainException(
-        static fn() => $service->assertAssistantInTeam('TeamB', 'zoe'),
-        'Vacation-only users should not count as team assistants.'
-    );
     assertDomainException(
         static fn() => $service->assertTeamAccess('Missing'),
         'Missing teams should not be accessible.'

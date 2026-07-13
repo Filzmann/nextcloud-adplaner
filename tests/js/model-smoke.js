@@ -10,7 +10,6 @@ require('../../js/models/shift-definition.js');
 require('../../js/models/shift-slot.js');
 require('../../js/models/team-settings.js');
 require('../../js/models/team.js');
-require('../../js/models/vacation-request.js');
 require('../../js/models/day-note.js');
 
 const {
@@ -20,8 +19,7 @@ const {
     ShiftDefinition,
     ShiftSlot,
     Team,
-    TeamSettings,
-    VacationRequest
+    TeamSettings
 } = window.ADPlaner.models;
 
 const assistant = Assistant.get({
@@ -71,7 +69,6 @@ assert(team instanceof Team);
 assert.strictEqual(team.assistants.length, 1);
 
 assert(TeamSettings.get({ team_code: 'TeamA' }) instanceof TeamSettings);
-assert(VacationRequest.get({ assistant_uid: 'anna', date_from: '2026-07-01' }) instanceof VacationRequest);
 assert(DayNote.get({ team_code: 'TeamA', note: 'Hinweis' }) instanceof DayNote);
 
 console.log('AdPlaner model smoke test passed.');

@@ -132,8 +132,8 @@ $settings = [
     ],
 ];
 
-$assistantTeam = new Team('A1', 'ad-ASN-A1', 'ad-ASN-A1-Urlaub', 'Team A1', $assistants, $assistants, false, $settings);
-$ebTeam = new Team('A1', 'ad-ASN-A1', 'ad-ASN-A1-Urlaub', 'Team A1', $assistants, $assistants, true, $settings);
+$assistantTeam = new Team('A1', 'ad-ASN-A1', 'Team A1', $assistants, false, $settings);
+$ebTeam = new Team('A1', 'ad-ASN-A1', 'Team A1', $assistants, true, $settings);
 $mappedTeam = Team::get($ebTeam->toArray());
 assertSameValue('Team A1', $mappedTeam->toArray()['displayName'], 'Team::get should keep the API payload shape.');
 
@@ -168,7 +168,7 @@ $configuredStore->slots = [
     new ShiftSlot(10, 'A1', '2026-07', '2026-07-01', 'early', 'Altfrueh', '07:00', '13:00', true),
     new ShiftSlot(11, 'A1', '2026-07', '2026-07-01', 'obsolete', 'Alt', '00:00', '01:00', true),
 ];
-$configuredTeam = new Team('A1', 'ad-ASN-A1', 'ad-ASN-A1-Urlaub', 'Team A1', $assistants, $assistants, true, [
+$configuredTeam = new Team('A1', 'ad-ASN-A1', 'Team A1', $assistants, true, [
     'shifts' => [
         ['key' => 'early', 'label' => 'Frueh neu', 'startsAt' => '08:00', 'endsAt' => '14:00', 'enabled' => true],
         ['key' => 'late', 'label' => 'Spaet', 'startsAt' => '14:00', 'endsAt' => '20:00', 'enabled' => true],

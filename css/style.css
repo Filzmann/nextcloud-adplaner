@@ -27,9 +27,7 @@
 .adp-controls,
 .adp-tabs,
 .adp-section-head,
-.adp-cell-actions,
-.adp-vacation-form,
-.adp-request-list {
+.adp-cell-actions {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -37,8 +35,7 @@
 }
 
 .adp-controls label,
-.adp-settings-form label,
-.adp-vacation-form label {
+.adp-settings-form label {
     display: grid;
     gap: 4px;
     font-weight: 600;
@@ -85,8 +82,7 @@
     margin: 0;
 }
 
-.adp-badge,
-.adp-request {
+.adp-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -150,8 +146,7 @@
     min-width: 90px;
 }
 
-.adp-day span,
-.adp-year-table thead span {
+.adp-day span {
     display: block;
     font-size: 1.15em;
     color: var(--color-main-text);
@@ -176,8 +171,7 @@
     background: var(--color-background-dark);
 }
 
-.adp-chip button,
-.adp-request button {
+.adp-chip button {
     min-width: 24px;
     min-height: 24px;
     margin: 0;
@@ -220,71 +214,6 @@
 
 .adp-note-text {
     white-space: pre-wrap;
-}
-
-.adp-vacation-form {
-    align-items: flex-end;
-    margin-bottom: 12px;
-}
-
-.adp-request-list {
-    min-height: 34px;
-    margin-bottom: 12px;
-}
-
-.adp-year-wrap {
-    max-height: calc(100vh - 280px);
-}
-
-.adp-year-table th,
-.adp-year-table td {
-    min-width: 34px;
-    width: 34px;
-    height: 34px;
-    padding: 2px;
-    text-align: center;
-}
-
-.adp-year-table th:first-child {
-    min-width: 180px;
-    width: 180px;
-    text-align: left;
-}
-
-.adp-year-table thead th {
-    font-size: 12px;
-}
-
-.adp-vac-cell {
-    background: var(--color-main-background);
-}
-
-.adp-vac-cell button {
-    width: 100%;
-    min-width: 28px;
-    height: 28px;
-    min-height: 28px;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 4px;
-    background: transparent;
-}
-
-.adp-year-table .adp-vac-cell.adp-vac-planned,
-.adp-request-planned {
-    background-color: #f3d27a;
-    color: #2d2300;
-}
-
-.adp-year-table .adp-vac-cell.adp-vac-approved,
-.adp-request-approved {
-    background-color: #7ccf91;
-    color: #082412;
-}
-
-.adp-year-table .adp-vac-cell.has-vacation button {
-    background: transparent;
 }
 
 .adp-table .is-weekend {

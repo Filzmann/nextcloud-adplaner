@@ -14,7 +14,6 @@ runJavaScriptSuite({
         'tests/js/plan-repository-smoke.js',
         'tests/js/settings-panel-smoke.js',
         'tests/js/ui-smoke.js',
-        'tests/js/vacation-plan-smoke.js',
     ],
     successMessage: 'AdPlaner JavaScript tests passed',
 });

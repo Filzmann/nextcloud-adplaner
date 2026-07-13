@@ -12,27 +12,20 @@ class Team {
     public function __construct(
         public string $code,
         public string $groupName,
-        public string $vacationGroupName,
         public string $displayName,
         public array $assistants,
-        public array $vacationAssistants,
         public bool $isEb,
         public array $settings
     ) {
         $this->assistants = $this->normalizeAssistants($this->assistants);
-        $this->vacationAssistants = $this->normalizeAssistants($this->vacationAssistants);
     }
 
     protected static function fromArray(array $data): self {
         return new self(
             (string)($data['code'] ?? ''),
             (string)($data['groupName'] ?? $data['group_name'] ?? ''),
-            (string)($data['vacationGroupName'] ?? $data['vacation_group_name'] ?? ''),
             (string)($data['displayName'] ?? $data['display_name'] ?? ''),
             is_array($data['assistants'] ?? null) ? $data['assistants'] : [],
-            is_array($data['vacationAssistants'] ?? $data['vacation_assistants'] ?? null)
-                ? ($data['vacationAssistants'] ?? $data['vacation_assistants'])
-                : [],
             (bool)($data['isEb'] ?? $data['is_eb'] ?? $data['canCoordinate'] ?? false),
             is_array($data['settings'] ?? null) ? $data['settings'] : []
         );
@@ -42,10 +35,8 @@ class Team {
         return [
             'code' => $this->code,
             'groupName' => $this->groupName,
-            'vacationGroupName' => $this->vacationGroupName,
             'displayName' => $this->displayName,
             'assistants' => $this->assistantsArray(),
-            'vacationAssistants' => $this->vacationAssistantsArray(),
             'isEb' => $this->isEb,
             'canCoordinate' => $this->isEb,
             'settings' => $this->settings,
@@ -56,16 +47,8 @@ class Team {
         return $this->assistants;
     }
 
-    public function vacationAssistants(): array {
-        return $this->vacationAssistants;
-    }
-
     public function assistantsArray(): array {
         return array_map(static fn(Assistant $assistant): array => $assistant->toArray(), $this->assistants);
-    }
-
-    public function vacationAssistantsArray(): array {
-        return array_map(static fn(Assistant $assistant): array => $assistant->toArray(), $this->vacationAssistants);
     }
 
     public function assistantLabelMap(): array {
@@ -92,16 +75,6 @@ class Team {
 
     public function assistantByUid(string $uid): ?Assistant {
         foreach ($this->assistants as $assistant) {
-            if ($assistant->uid === $uid) {
-                return $assistant;
-            }
-        }
-
-        return null;
-    }
-
-    public function vacationAssistantByUid(string $uid): ?Assistant {
-        foreach ($this->vacationAssistants as $assistant) {
             if ($assistant->uid === $uid) {
                 return $assistant;
             }

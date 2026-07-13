@@ -2,10 +2,10 @@
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>adplaner</id>
-    <name>Assistenz Dienst- und Urlaubsplanung</name>
-    <summary>Wunschdienstplanung mit gemeinsamer Urlaubsansicht für Assistenzteams.</summary>
-    <description>Verwaltet monatliche Wunschdienstpläne für Assistenzteams und bindet die zentrale Jahresurlaubssicht aus AD Urlaub ein.</description>
-    <version>0.1.8</version>
+    <name>Assistenz Dienstplanung</name>
+    <summary>Wunschdienstplanung für Assistenzteams.</summary>
+    <description>Verwaltet monatliche Wunschdienstpläne für Assistenzteams auf Basis dynamischer Nextcloud-Gruppen.</description>
+    <version>0.1.9</version>
     <licence>agpl</licence>
     <author>Simon / ChatGPT-Prototyp</author>
     <namespace>AdPlaner</namespace>

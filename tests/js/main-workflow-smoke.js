@@ -8,12 +8,11 @@ const {
 const elements = createElementMap([
     'team-select',
     'month-input',
-    'year-input',
     'adp-panel',
 ]);
 const tabs = new FakeElement('tabs');
 const tabMonth = new FakeButton({ view: 'month' }, 'tab-month');
-const tabVacation = new FakeButton({ view: 'vacation' }, 'tab-vacation');
+const tabSettings = new FakeButton({ view: 'settings' }, 'tab-settings');
 
 const notices = [];
 const errors = [];
@@ -52,11 +51,6 @@ global.window = {
                 return `<section data-view="month">${esc(plan && plan.team ? plan.team.code : '')}:${esc(plan ? plan.month : '')}</section>`;
             }
         },
-        vacationPlan: {
-            render(plan) {
-                return `<section data-view="vacation">${esc(plan && plan.team ? plan.team.code : '')}:${esc(plan ? plan.year : '')}</section>`;
-            }
-        },
         settingsPanel: {
             render(team) {
                 return `<form id="settings-form">${esc(team ? team.code : '')}</form>`;
@@ -85,7 +79,7 @@ global.document = {
         return selector === '.adp-tabs' ? tabs : null;
     },
     querySelectorAll(selector) {
-        return selector === '.adp-tab' ? [tabMonth, tabVacation] : [];
+        return selector === '.adp-tab' ? [tabMonth, tabSettings] : [];
     }
 };
 
@@ -103,8 +97,7 @@ class FakePlanRepository {
                 { code: 'TeamA', displayName: 'Team <A>' },
                 { code: 'TeamB', displayName: 'Team B' }
             ],
-            defaultMonth: '2026-07',
-            defaultYear: 2026
+            defaultMonth: '2026-07'
         };
     }
 
@@ -114,19 +107,10 @@ class FakePlanRepository {
         return { month, team: { code: teamCode, displayName: teamCode === 'TeamA' ? 'Team <A>' : teamCode } };
     }
 
-    async vacationPlan(teamCode, year) {
-        repositoryCalls.push(['vacationPlan', teamCode, year]);
-
-        return { year, team: { code: teamCode, displayName: teamCode === 'TeamA' ? 'Team <A>' : teamCode }, requests: [] };
-    }
-
     async addSelf(teamCode, month, slotId) {
         repositoryCalls.push(['addSelf', teamCode, month, slotId]);
     }
 
-    async setVacationStatus(teamCode, year, assistantUid, date, status) {
-        repositoryCalls.push(['setVacationStatus', teamCode, year, assistantUid, date, status]);
-    }
 }
 
 window.ADPlaner.repositories = { PlanRepository: FakePlanRepository };
@@ -151,7 +135,6 @@ async function flush() {
     assert(!elements.get('team-select').innerHTML.includes('Team <A>'));
     assert.strictEqual(elements.get('team-select').disabled, false);
     assert.strictEqual(elements.get('month-input').value, '2026-07');
-    assert.strictEqual(elements.get('year-input').value, '2026');
     assert.strictEqual(tabMonth.classList.has('is-active'), true);
     assert(elements.get('adp-panel').innerHTML.includes('TeamA:2026-07'));
 
@@ -159,25 +142,6 @@ async function flush() {
     assert.deepStrictEqual(repositoryCalls.at(-1), ['monthPlan', 'TeamB', '2026-07']);
     assert(elements.get('adp-panel').innerHTML.includes('TeamB:2026-07'));
 
-    await tabs.listeners.click({ target: tabVacation });
-    assert.strictEqual(tabVacation.classList.has('is-active'), true);
-    assert.deepStrictEqual(repositoryCalls.at(-1), ['vacationPlan', 'TeamB', '2026']);
-    assert(elements.get('adp-panel').innerHTML.includes('TeamB:2026'));
-
-    await elements.get('adp-panel').listeners.click({
-        target: new FakeButton({
-            action: 'set-vacation-status',
-            targetUid: 'anna',
-            date: '2026-07-02',
-            status: 'approved'
-        })
-    });
-    assert.deepStrictEqual(repositoryCalls.slice(-2), [
-        ['setVacationStatus', 'TeamB', '2026', 'anna', '2026-07-02', 'approved'],
-        ['vacationPlan', 'TeamB', '2026']
-    ]);
-
-    await tabs.listeners.click({ target: tabMonth });
     await elements.get('adp-panel').listeners.click({
         target: new FakeButton({
             action: 'add-self',

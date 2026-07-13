@@ -14,7 +14,7 @@ Nextcloud-App-ID:
 
 ## Zielsetzung
 
-AdPlaner soll Dienstplanung und Urlaubsplanung in Assistenzteams abbilden.
+AdPlaner bildet die Wunschdienstplanung in Assistenzteams ab. Urlaubsplanung gehört ausschließlich in die separate App `adurlaub`.
 
 Kernprozess:
 
@@ -25,15 +25,11 @@ Kernprozess:
 - Luecken und Ueberlappungen in Schichtdefinitionen sind moeglich und duerfen nicht vorschnell wegvalidiert werden.
 - Zuweisungen je Schicht folgen der Rollenlogik: eigene Eintraege durch Assistenz, fremde Zuweisungen nur durch EB.
 - EB-Konten selbst sind nicht schichtfaehig.
-- Jahres-Urlaubsplanung zeigt alle Tage als Spalten und Assistenzkraefte als Zeilen. Sie verwendet die kanonische API und Persistenz der separaten App `adurlaub`.
-- Urlaubswuensche sind globale Eintraege pro Person und in allen Teams der Person sichtbar; Persistenz und Schreib-API liegen ausschließlich in `adurlaub`.
-- Optionale Urlaubssichtbarkeit laeuft ueber `ad-ASN-<Kuerzel>-Urlaub`; ohne diese Gruppe wird die Assistenznehmer-Gruppe selbst verwendet.
 - Statuswechsel wie `planned` und `approved` erfolgen nur durch EB.
 
 Offene Zielbereiche:
 
 - Produktive Rechte- und Datenschutzpruefung.
-- Feingranulare Urlaubsteilung, wenn nur ein Tag innerhalb eines Bereichs geaendert wird.
 - Export, Benachrichtigungen und Dienstplan-Festschreibung.
 - Spaetere Konfigurierbarkeit dort ausbauen, wo konkrete Teams unterschiedliche Regeln brauchen.
 
@@ -72,10 +68,8 @@ Gruppenschema fuer `adplaner`:
 
 - Assistenznehmer-Gruppen: `ad-ASN-<Kuerzel>`, zum Beispiel `ad-ASN-TeamB`, `ad-ASN-TeamA`, `ad-ASN-TeamC`.
 - `<Kuerzel>` ist das Kuerzel eines Assistenznehmers und darf Unicode-Buchstaben sowie Ziffern enthalten.
-- Optionale Urlaubssichtbarkeitsgruppe: `ad-ASN-<Kuerzel>-Urlaub`.
 - EB-Rechte: Nutzer*innen, die zugleich in der Assistenznehmer-Gruppe und der gemeinsamen Rollengruppe `ad-EB` sind. Rollen-/Bereichskombinationen werden nicht als eigene Gruppen akzeptiert.
 - Bereichszuordnungen werden app-uebergreifend separat als `ad-Bereich-<Name>` gepflegt; kombinierte Rollen-/Bereichsgruppen werden dynamisch abgeleitet.
-- Die Urlaubssicht ist Teil des gemeinsamen Teamkatalogs aus ASN-Teams, Büro NOW/Süd, PFK und Stab; AdPlaner öffnet daraus jeweils die zum gewählten ASN-Team passende Sicht.
 
 ## Architekturregeln
 

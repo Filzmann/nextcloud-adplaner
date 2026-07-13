@@ -10,7 +10,6 @@ script('adplaner', 'models/shift-definition');
 script('adplaner', 'models/shift-slot');
 script('adplaner', 'models/team-settings');
 script('adplaner', 'models/team');
-script('adplaner', 'models/vacation-request');
 script('adplaner', 'models/day-note');
 script('localbase', 'repositories/repository');
 script('adplaner', 'repositories/plan-repository');
@@ -19,7 +18,6 @@ script('adplaner', 'components/day-note-control');
 script('adplaner', 'components/assignment-control');
 script('adplaner', 'components/shift-settings-list');
 script('adplaner', 'components/month-plan');
-script('adplaner', 'components/vacation-plan');
 script('adplaner', 'components/settings-panel');
 script('adplaner', 'main');
 style('adplaner', 'style');
@@ -37,16 +35,11 @@ style('adplaner', 'style');
                 Monat
                 <input id="month-input" type="month">
             </label>
-            <label>
-                Jahr
-                <input id="year-input" type="number" min="2000" max="2100" step="1">
-            </label>
         </div>
     </header>
 
     <nav class="adp-tabs" aria-label="Planbereiche">
         <button type="button" class="adp-tab is-active" data-view="month">Wunschplan</button>
-        <button type="button" class="adp-tab" data-view="vacation">Urlaub</button>
         <button type="button" class="adp-tab" data-view="settings">Einstellungen</button>
     </nav>
 

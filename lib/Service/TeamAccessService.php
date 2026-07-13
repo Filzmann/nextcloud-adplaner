@@ -65,10 +65,8 @@ class TeamAccessService {
         return new Team(
             $teamCode,
             $groupName,
-            $this->vacationGroupName($teamCode),
             $settings->displayName,
             $assistants,
-            $this->vacationAssistantsForTeam($teamCode, $assistants),
             $this->currentUserIsEbForTeam($teamCode),
             $settings->config
         );
@@ -138,15 +136,6 @@ class TeamAccessService {
         return $assistants;
     }
 
-    private function vacationAssistantsForTeam(string $teamCode, array $fallbackAssistants): array {
-        $group = $this->groupManager->get($this->vacationGroupName($teamCode));
-        if ($group === null) {
-            return $fallbackAssistants;
-        }
-
-        return $this->assistantsForGroup($group);
-    }
-
     private function currentUserInGroup(string $groupName): bool {
         $user = $this->userSession->getUser();
         if ($user === null) {
@@ -177,7 +166,4 @@ class TeamAccessService {
         return 'ad-ASN-' . $teamCode;
     }
 
-    private function vacationGroupName(string $teamCode): string {
-        return 'ad-ASN-' . $teamCode . '-Urlaub';
-    }
 }
