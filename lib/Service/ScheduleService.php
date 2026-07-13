@@ -63,7 +63,7 @@ class ScheduleService {
         $slot = $this->requireSlot($slotId, $team->code, $month);
         if ($targetUid === '') {
             if ($team->isEb) {
-                throw new \DomainException('Bitte eine Assistenzkraft auswaehlen.');
+                throw new \DomainException('Bitte eine Assistenzkraft auswählen.');
             }
 
             $targetUid = $currentUid;
@@ -175,17 +175,17 @@ class ScheduleService {
             return;
         }
 
-        throw new \DomainException('Assistenzkraefte duerfen nur eigene Eintraege bearbeiten.');
+        throw new \DomainException('Assistenzkräfte dürfen nur eigene Einträge bearbeiten.');
     }
 
     private function assertAssignableAssistantInTeam(Team $team, string $assistantUid): void {
         $assistant = $team->assistantByUid($assistantUid);
         if ($assistant === null) {
-            throw new \DomainException('Diese Assistenz gehoert nicht zum Team.');
+            throw new \DomainException('Diese Assistenz gehört nicht zum Team.');
         }
 
         if (!$assistant->canReceiveShifts) {
-            throw new \DomainException('Einsatzbegleitungen koennen keiner Schicht zugeteilt werden.');
+            throw new \DomainException('Einsatzbegleitungen können keiner Schicht zugeteilt werden.');
         }
     }
 }

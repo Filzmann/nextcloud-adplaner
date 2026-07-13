@@ -12,6 +12,7 @@ namespace {
 
     require __DIR__ . '/helpers.php';
     require __DIR__ . '/../../../localbase/lib/Model/ModelApiTrait.php';
+    require __DIR__ . '/../../../localbase/lib/Organization/AdOrganizationDefinition.php';
     require __DIR__ . '/../../lib/Model/Assistant.php';
     require __DIR__ . '/../../lib/Model/Team.php';
     require __DIR__ . '/../../lib/Model/TeamSettings.php';

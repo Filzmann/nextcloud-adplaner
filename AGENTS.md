@@ -18,8 +18,8 @@ AdPlaner bildet die Wunschdienstplanung in Assistenzteams ab. Urlaubsplanung geh
 
 Kernprozess:
 
-- Assistenznehmer werden aus Nextcloud-Gruppen `ad-ASN-<Kuerzel>` abgeleitet.
-- EB-Rechte erhalten Nutzer*innen, die zugleich im Team und in der app-uebergreifend gemeinsamen Rollengruppe `ad-EB` sind.
+- Assistenznehmer werden aus Nextcloud-Gruppen mit dem gemeinsam konfigurierten Assistenzteam-Präfix abgeleitet.
+- EB-Rechte erhalten Nutzer*innen, die zugleich im Team und in der gemeinsam konfigurierten EB-Rollengruppe sind.
 - Monatliche Wunschplaene werden je Assistenzteam erstellt.
 - Die Schichtliste ist variabel konfigurierbar; Standard ist 08-14, 14-20 und 20-08.
 - Luecken und Ueberlappungen in Schichtdefinitionen sind moeglich und duerfen nicht vorschnell wegvalidiert werden.
@@ -66,10 +66,14 @@ In Codex-Sessions koennen DDEV-Befehle im normalen Sandbox-Kontext nicht zuverla
 
 Gruppenschema fuer `adplaner`:
 
+Die folgenden IDs sind initiale Standardwerte. Assistenzteam-Präfix, sichtbarer Teamname, maximale Kürzellänge, EB-Rollengruppe und Bereiche stammen aus der gemeinsamen `AdOrganizationDefinition` und dürfen nicht zusätzlich im AdPlaner festverdrahtet werden.
+
 - Assistenznehmer-Gruppen: `ad-ASN-<Kuerzel>`, zum Beispiel `ad-ASN-TeamB`, `ad-ASN-TeamA`, `ad-ASN-TeamC`.
 - `<Kuerzel>` ist das Kuerzel eines Assistenznehmers und darf Unicode-Buchstaben sowie Ziffern enthalten.
 - EB-Rechte: Nutzer*innen, die zugleich in der Assistenznehmer-Gruppe und der gemeinsamen Rollengruppe `ad-EB` sind. Rollen-/Bereichskombinationen werden nicht als eigene Gruppen akzeptiert.
 - Bereichszuordnungen werden app-uebergreifend separat als `ad-Bereich-<Name>` gepflegt; kombinierte Rollen-/Bereichsgruppen werden dynamisch abgeleitet.
+- AdPlaner und AD Urlaub verwenden dieselben Assistenzteam-Gruppen; separate Suffix-Gruppen werden nicht unterstützt.
+- Schichten werden ausschließlich über die strukturierte Schichtkonfiguration verwaltet. Frühere einzelne Legacy-Parameter für Früh-, Spät- oder Nachtschichten werden nicht weitergeführt.
 
 ## Architekturregeln
 

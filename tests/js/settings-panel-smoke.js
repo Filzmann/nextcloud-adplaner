@@ -15,13 +15,13 @@ const team = {
     settings: {
         meetingDay: '2026-07-15',
         shifts: [
-            { key: 'early', label: 'Frueh <A>', startsAt: '08:00', endsAt: '14:00', enabled: true },
+            { key: 'early', label: 'Früh <A>', startsAt: '08:00', endsAt: '14:00', enabled: true },
             { key: 'night', label: 'Nacht', startsAt: '20:00', endsAt: '08:00', enabled: false }
         ]
     }
 };
 
-assert(settingsPanel.render(null).includes('Kein Assistenznehmer gewaehlt.'));
+assert(settingsPanel.render(null).includes('Kein Assistenznehmer gewählt.'));
 
 const readonlyHtml = settingsPanel.render({
     ...team,
@@ -31,8 +31,8 @@ const readonlyHtml = settingsPanel.render({
 assert(readonlyHtml.includes('Team &lt;Settings&gt;'));
 assert(!readonlyHtml.includes('Team <Settings>'));
 assert(readonlyHtml.includes('<dd>15.07.</dd>'));
-assert(readonlyHtml.includes('Frueh &lt;A&gt; 08:00-14:00'));
-assert(!readonlyHtml.includes('Frueh <A>'));
+assert(readonlyHtml.includes('Früh &lt;A&gt; 08:00-14:00'));
+assert(!readonlyHtml.includes('Früh <A>'));
 assert(readonlyHtml.includes('adp-readonly-shift is-disabled'));
 assert(!readonlyHtml.includes('id="settings-form"'));
 
@@ -44,7 +44,7 @@ const editorHtml = settingsPanel.render({
 assert(editorHtml.includes('id="settings-form"'));
 assert(editorHtml.includes('value="Team &lt;Settings&gt;"'));
 assert(editorHtml.includes('value="early"'));
-assert(editorHtml.includes('value="Frueh &lt;A&gt;"'));
+assert(editorHtml.includes('value="Früh &lt;A&gt;"'));
 assert(editorHtml.includes('data-action="add-shift-row"'));
 assert(editorHtml.includes('data-action="remove-shift-row"'));
 assert(editorHtml.includes('<button type="submit">Speichern</button>'));
@@ -56,14 +56,14 @@ const collectForm = {
         return [
             row({
                 shiftKey: 'early',
-                shiftLabel: 'Frueh',
+                shiftLabel: 'Früh',
                 shiftStart: '08:00',
                 shiftEnd: '14:00',
                 shiftEnabled: true
             }),
             row({
                 shiftKey: 'late',
-                shiftLabel: 'Spaet',
+                shiftLabel: 'Spät',
                 shiftStart: '14:00',
                 shiftEnd: '20:00',
                 shiftEnabled: false
@@ -73,8 +73,8 @@ const collectForm = {
 };
 
 assert.deepStrictEqual(shiftSettingsList.collect(collectForm), [
-    { key: 'early', label: 'Frueh', startsAt: '08:00', endsAt: '14:00', enabled: true },
-    { key: 'late', label: 'Spaet', startsAt: '14:00', endsAt: '20:00', enabled: false }
+    { key: 'early', label: 'Früh', startsAt: '08:00', endsAt: '14:00', enabled: true },
+    { key: 'late', label: 'Spät', startsAt: '14:00', endsAt: '20:00', enabled: false }
 ]);
 
 const insertedRows = [];

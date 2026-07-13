@@ -6,7 +6,7 @@
 
     function render(plan, currentUser) {
         if (!plan || !plan.team) {
-            return '<p>Kein Assistenznehmer gewaehlt.</p>';
+            return '<p>Kein Assistenznehmer gewählt.</p>';
         }
 
         const team = plan.team;

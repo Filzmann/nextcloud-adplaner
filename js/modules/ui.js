@@ -35,7 +35,7 @@
         notice.show(message);
     }
 
-    function showError(error, fallback = 'Die Aktion konnte nicht ausgefuehrt werden.') {
+    function showError(error, fallback = 'Die Aktion konnte nicht ausgeführt werden.') {
         notice.error(error, fallback);
     }
 

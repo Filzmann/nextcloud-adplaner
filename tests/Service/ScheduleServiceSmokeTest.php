@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/helpers.php';
 require __DIR__ . '/../../../localbase/lib/Model/ModelApiTrait.php';
+require __DIR__ . '/../../../localbase/lib/Organization/AdOrganizationDefinition.php';
 require __DIR__ . '/../../lib/Model/Assistant.php';
 require __DIR__ . '/../../lib/Model/ShiftCandidate.php';
 require __DIR__ . '/../../lib/Model/ShiftDefinition.php';
@@ -35,7 +36,7 @@ class FakeShiftPlanStoreForSchedule extends ShiftPlanStore {
     }
 
     public function slotForMonth(int $slotId, string $teamCode, string $month): ?ShiftSlot {
-        return new ShiftSlot($slotId, $teamCode, $month, $month . '-01', 'early', 'Frueh', '08:00', '14:00', true);
+        return new ShiftSlot($slotId, $teamCode, $month, $month . '-01', 'early', 'Früh', '08:00', '14:00', true);
     }
 
     public function addCandidate(int $slotId, string $assistantUid, string $createdByUid): void {
@@ -48,7 +49,7 @@ class FakeShiftPlanStoreForSchedule extends ShiftPlanStore {
         }
 
         return [
-            new ShiftSlot(1, $teamCode, $month, $month . '-01', 'early', 'Frueh', '08:00', '14:00', true),
+            new ShiftSlot(1, $teamCode, $month, $month . '-01', 'early', 'Früh', '08:00', '14:00', true),
         ];
     }
 
@@ -128,7 +129,7 @@ assertSameValue(2, count($assistantModels), 'Assistant::get_all should hydrate A
 
 $settings = [
     'shifts' => [
-        ['key' => 'early', 'label' => 'Frueh', 'startsAt' => '08:00', 'endsAt' => '14:00', 'enabled' => true],
+        ['key' => 'early', 'label' => 'Früh', 'startsAt' => '08:00', 'endsAt' => '14:00', 'enabled' => true],
     ],
 ];
 
@@ -165,13 +166,13 @@ assertSameValue(['assistant-a'], array_column($slotCandidates, 'uid'), 'Month pl
 
 $configuredStore = new FakeShiftPlanStoreForSchedule();
 $configuredStore->slots = [
-    new ShiftSlot(10, 'A1', '2026-07', '2026-07-01', 'early', 'Altfrueh', '07:00', '13:00', true),
+    new ShiftSlot(10, 'A1', '2026-07', '2026-07-01', 'early', 'Altfrüh', '07:00', '13:00', true),
     new ShiftSlot(11, 'A1', '2026-07', '2026-07-01', 'obsolete', 'Alt', '00:00', '01:00', true),
 ];
 $configuredTeam = new Team('A1', 'ad-ASN-A1', 'Team A1', $assistants, true, [
     'shifts' => [
-        ['key' => 'early', 'label' => 'Frueh neu', 'startsAt' => '08:00', 'endsAt' => '14:00', 'enabled' => true],
-        ['key' => 'late', 'label' => 'Spaet', 'startsAt' => '14:00', 'endsAt' => '20:00', 'enabled' => true],
+        ['key' => 'early', 'label' => 'Früh neu', 'startsAt' => '08:00', 'endsAt' => '14:00', 'enabled' => true],
+        ['key' => 'late', 'label' => 'Spät', 'startsAt' => '14:00', 'endsAt' => '20:00', 'enabled' => true],
         ['key' => 'night', 'label' => 'Nacht', 'startsAt' => '20:00', 'endsAt' => '08:00', 'enabled' => false],
     ],
 ]);
@@ -182,10 +183,10 @@ foreach ($configuredStore->updatedSlots as $updatedSlot) {
     $updatesById[$updatedSlot['slotId']] = $updatedSlot;
 }
 
-assertSameValue('Frueh neu', $updatesById[10]['label'] ?? null, 'Existing slots should be updated to the current shift label.');
+assertSameValue('Früh neu', $updatesById[10]['label'] ?? null, 'Existing slots should be updated to the current shift label.');
 assertSameValue(false, $updatesById[11]['enabled'] ?? null, 'Slots for removed shift segments should be disabled.');
 assertSameValue('late', $configuredStore->insertedSlots[0]['segmentKey'] ?? null, 'Missing enabled segments should be inserted for the first day.');
 assertSameValue(false, in_array('night', array_column($configuredStore->insertedSlots, 'segmentKey'), true), 'Disabled shift segments should not be inserted.');
-assertSameValue('Frueh neu', $configuredPlan['days'][0]['slots'][0]['label'] ?? null, 'Month plan should use refreshed slot definitions.');
+assertSameValue('Früh neu', $configuredPlan['days'][0]['slots'][0]['label'] ?? null, 'Month plan should use refreshed slot definitions.');
 
 echo 'AdPlaner schedule smoke tests passed' . PHP_EOL;

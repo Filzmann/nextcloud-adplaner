@@ -6,16 +6,17 @@ namespace OCA\AdPlaner\Service;
 
 use OCA\AdPlaner\Model\Assistant;
 use OCA\AdPlaner\Model\Team;
+use OCA\LocalBase\Organization\AdOrganizationDefinition;
+use OCA\LocalBase\Organization\AdOrganizationSettingsService;
 use OCP\IGroupManager;
 use OCP\IUserSession;
 
 class TeamAccessService {
-    public const ROLE_EB = 'ad-EB';
-
     public function __construct(
         private IGroupManager $groupManager,
         private IUserSession $userSession,
-        private TeamSettingsService $settingsService
+        private TeamSettingsService $settingsService,
+        private ?AdOrganizationSettingsService $organization = null,
     ) {
     }
 
@@ -36,10 +37,12 @@ class TeamAccessService {
 
         $groupIds = $this->groupManager->getUserGroupIds($user);
         $teamCodes = [];
+        $prefix = $this->definition()->teamGroupPrefix();
         foreach ($groupIds as $groupId) {
-            if (preg_match('/^ad-ASN-([\p{L}\p{N}]{1,16})$/u', (string)$groupId, $matches)) {
-                $teamCodes[] = $matches[1];
-            }
+            $groupId = (string)$groupId;
+            if (!str_starts_with($groupId, $prefix) || $groupId === $prefix) continue;
+            $code = substr($groupId, strlen($prefix));
+            try { $teamCodes[] = $this->normalizeTeamCode($code); } catch (\InvalidArgumentException) {}
         }
 
         $teamCodes = array_values(array_unique($teamCodes));
@@ -84,7 +87,7 @@ class TeamAccessService {
     public function assertCanCoordinate(string $teamCode): Team {
         $team = $this->assertTeamAccess($teamCode);
         if (!$team->isEb) {
-            throw new \DomainException('Nur die Einsatzbegleitung darf diese Aktion ausfuehren.');
+            throw new \DomainException('Nur die Einsatzbegleitung darf diese Aktion ausführen.');
         }
 
         return $team;
@@ -96,16 +99,11 @@ class TeamAccessService {
             return;
         }
 
-        throw new \DomainException('Diese Assistenz gehoert nicht zum Team.');
+        throw new \DomainException('Diese Assistenz gehört nicht zum Team.');
     }
 
     public function normalizeTeamCode(string $teamCode): string {
-        $teamCode = trim($teamCode);
-        if (!preg_match('/^[\p{L}\p{N}]{1,16}$/u', $teamCode)) {
-            throw new \InvalidArgumentException('ASN-Kuerzel duerfen hoechstens 16 Buchstaben oder Ziffern enthalten; Umlaute sind erlaubt.');
-        }
-
-        return $teamCode;
+        return $this->definition()->normalizeTeamCode($teamCode);
     }
 
     public function currentUserIsEbForTeam(string $teamCode): bool {
@@ -159,11 +157,18 @@ class TeamAccessService {
             return false;
         }
 
-        return in_array(self::ROLE_EB, array_map('strval', $this->groupManager->getUserGroupIds($user)), true);
+        return in_array($this->definition()->roleGroupId('eb'), array_map('strval', $this->groupManager->getUserGroupIds($user)), true);
     }
 
     private function teamGroupName(string $teamCode): string {
-        return 'ad-ASN-' . $teamCode;
+        return $this->definition()->teamGroupPrefix() . $teamCode;
     }
+
+    public function organizationContract(): array {
+        $definition = $this->definition();
+        return ['teamGroupPrefix' => $definition->teamGroupPrefix(), 'teamLabelPrefix' => $definition->teamLabelPrefix(), 'teamCodeMaxLength' => $definition->teamCodeMaxLength(), 'coordinatorGroupId' => $definition->roleGroupId('eb'), 'coordinatorLabel' => $definition->roleLabel('eb')];
+    }
+
+    private function definition(): AdOrganizationDefinition { return $this->organization?->definition() ?? AdOrganizationDefinition::defaults(); }
 
 }

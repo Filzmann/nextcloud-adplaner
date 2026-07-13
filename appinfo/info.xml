@@ -5,7 +5,7 @@
     <name>Assistenz Dienstplanung</name>
     <summary>Wunschdienstplanung für Assistenzteams.</summary>
     <description>Verwaltet monatliche Wunschdienstpläne für Assistenzteams auf Basis dynamischer Nextcloud-Gruppen.</description>
-    <version>0.1.11</version>
+    <version>0.2.0</version>
     <licence>agpl</licence>
     <author>Simon / ChatGPT-Prototyp</author>
     <namespace>AdPlaner</namespace>
@@ -13,6 +13,7 @@
     <bugs>https://example.invalid</bugs>
     <dependencies>
         <nextcloud min-version="29" max-version="35"/>
+        <app>localbase</app>
         <app>orgsuite</app>
     </dependencies>
 </info>

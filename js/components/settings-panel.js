@@ -4,7 +4,7 @@
 
     function render(team) {
         if (!team) {
-            return '<p>Kein Assistenznehmer gewaehlt.</p>';
+            return '<p>Kein Assistenznehmer gewählt.</p>';
         }
 
         const settings = team.settings || {};

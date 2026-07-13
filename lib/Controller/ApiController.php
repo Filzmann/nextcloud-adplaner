@@ -38,9 +38,10 @@ class ApiController extends Controller {
                     static fn($team): array => $team->toArray(),
                     $this->teamAccess->teamsForCurrentUser()
                 ),
+                'organization' => $this->teamAccess->organizationContract(),
                 'defaultMonth' => date('Y-m'),
                 'defaultYear' => (int)date('Y'),
-                'notice' => 'Assistenzteams werden aus ad-ASN-<Kuerzel> gelesen; EB-Rechte stammen aus der gemeinsamen Rollengruppe ad-EB.',
+                'notice' => 'Assistenzteams und Koordinationsrechte folgen den gemeinsamen AD-Organisationseinstellungen.',
             ];
         }, [$this->logger, 'error'], 'state');
     }
@@ -59,45 +60,16 @@ class ApiController extends Controller {
         string $teamCode,
         string $displayName = '',
         string $meetingDay = '',
-        string $shiftsJson = '',
-        string $earlyStart = '08:00',
-        string $lateStart = '14:00',
-        string $nightStart = '20:00',
-        bool $enabledEarly = true,
-        bool $enabledLate = true,
-        bool $enabledNight = true
+        string $shiftsJson = ''
     ): DataResponse {
         return $this->responder->respond(function () use (
             $teamCode,
             $displayName,
             $meetingDay,
-            $shiftsJson,
-            $earlyStart,
-            $lateStart,
-            $nightStart,
-            $enabledEarly,
-            $enabledLate,
-            $enabledNight
+            $shiftsJson
         ): array {
             $team = $this->teamAccess->assertCanCoordinate($teamCode);
-            $config = [
-                'meetingDay' => $meetingDay,
-            ];
-            $shifts = $this->decodeShiftsJson($shiftsJson);
-            if ($shifts !== null) {
-                $config['shifts'] = $shifts;
-            } else {
-                $config['shiftStarts'] = [
-                    'early' => $earlyStart,
-                    'late' => $lateStart,
-                    'night' => $nightStart,
-                ];
-                $config['enabledSegments'] = [
-                    'early' => $enabledEarly,
-                    'late' => $enabledLate,
-                    'night' => $enabledNight,
-                ];
-            }
+            $config = ['meetingDay' => $meetingDay, 'shifts' => $this->decodeShiftsJson($shiftsJson)];
 
             $settings = $this->teamSettings->save($team->code, $displayName, $config);
 
@@ -147,10 +119,10 @@ class ApiController extends Controller {
         ]);
     }
 
-    private function decodeShiftsJson(string $shiftsJson): ?array {
+    private function decodeShiftsJson(string $shiftsJson): array {
         $shiftsJson = trim($shiftsJson);
         if ($shiftsJson === '') {
-            return null;
+            throw new \InvalidArgumentException('Mindestens eine Schicht muss übergeben werden.');
         }
 
         $decoded = json_decode($shiftsJson, true);

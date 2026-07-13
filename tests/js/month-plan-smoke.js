@@ -14,8 +14,8 @@ const { monthPlan } = window.ADPlaner;
 const basePlan = {
     month: '2026-07',
     segments: [
-        { key: 'early', label: 'Frueh <A>', startsAt: '08:00', endsAt: '14:00' },
-        { key: 'late', label: 'Spaet', startsAt: '14:00', endsAt: '20:00' }
+        { key: 'early', label: 'Früh <A>', startsAt: '08:00', endsAt: '14:00' },
+        { key: 'late', label: 'Spät', startsAt: '14:00', endsAt: '20:00' }
     ],
     days: [
         {
@@ -51,7 +51,7 @@ const assistantHtml = monthPlan.render({
 assert(assistantHtml.includes('Team &lt;A1&gt; - 2026-07'));
 assert(!assistantHtml.includes('Team <A1>'));
 assert(assistantHtml.includes('Treffen 15.07.'));
-assert(assistantHtml.includes('Frueh &lt;A&gt;'));
+assert(assistantHtml.includes('Früh &lt;A&gt;'));
 assert(assistantHtml.includes('Mi<span>1</span>'));
 assert(assistantHtml.includes('data-action="add-self" data-slot-id="10"'));
 assert(!assistantHtml.includes('data-action="add-self" data-slot-id="11"'));

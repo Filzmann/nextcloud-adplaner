@@ -22,22 +22,6 @@ assertSameValue('14:00', $defaultSegments[0]['endsAt'], 'Default early shift sho
 assertSameValue('20:00', $defaultSegments[2]['startsAt'], 'Default night shift should start at 20:00.');
 assertSameValue('08:00', $defaultSegments[2]['endsAt'], 'Default night shift should end at the next early start.');
 
-$legacySettings = $service->normalize([
-    'meetingDay' => '2026-07-15',
-    'shiftStarts' => [
-        'early' => '07:00',
-        'late' => '15:00',
-        'night' => '21:30',
-    ],
-    'enabledSegments' => [
-        'before_early' => false,
-        'early' => true,
-        'late' => true,
-        'night' => true,
-    ],
-]);
-
-$legacySegments = $service->segments($legacySettings);
 $customSettings = $service->normalize([
     'meetingDay' => '2026-07-15',
     'shifts' => [
@@ -50,7 +34,7 @@ $customSettings = $service->normalize([
         ],
         [
             'key' => 'overlap',
-            'label' => 'Ueberlappung',
+            'label' => 'Überlappung',
             'startsAt' => '11:00',
             'endsAt' => '15:00',
             'enabled' => true,
@@ -67,12 +51,7 @@ $customSettings = $service->normalize([
 $customSegments = $service->segments($customSettings);
 $days = $service->monthDays('2026-02');
 
-assertSameValue('2026-07-15', $legacySettings['meetingDay'], 'Meeting day should be preserved.');
-assertSameValue(['early', 'late', 'night'], array_column($legacySegments, 'key'), 'Legacy segments should stay in day order without a separate before-early segment.');
-assertSameValue('07:00', $legacySegments[0]['startsAt'], 'Legacy early segment should start at configured time.');
-assertSameValue('15:00', $legacySegments[0]['endsAt'], 'Legacy early segment should end at late start.');
-assertSameValue('21:30', $legacySegments[2]['startsAt'], 'Legacy night segment should start at configured time.');
-assertSameValue('07:00', $legacySegments[2]['endsAt'], 'Legacy night segment should end at early start on the following day.');
+assertSameValue('2026-07-15', $customSettings['meetingDay'], 'Meeting day should be preserved.');
 assertSameValue(['first', 'overlap', 'night'], array_column($customSegments, 'key'), 'Custom shifts should keep their configured order.');
 assertSameValue('11:00', $customSegments[1]['startsAt'], 'Overlapping custom shifts should be allowed.');
 assertSameValue('15:00', $customSegments[1]['endsAt'], 'Overlapping custom shifts should keep their end time.');

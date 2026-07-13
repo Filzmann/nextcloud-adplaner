@@ -18,6 +18,7 @@
         month: '',
         activeView: 'month',
         monthPlan: null,
+        organization: {},
         loading: false
     };
 
@@ -30,6 +31,7 @@
             const data = await repository.state();
             state.currentUser = data.currentUser || null;
             state.teams = data.teams || [];
+            state.organization = data.organization || {};
             state.month = data.defaultMonth || new Date().toISOString().slice(0, 7);
             state.selectedTeamCode = state.teams.length ? state.teams[0].code : '';
 
@@ -37,7 +39,8 @@
             if (state.selectedTeamCode) {
                 await reloadActive();
             } else {
-                showNotice('Keine Gruppe nach dem Muster ad-ASN-<Kuerzel> gefunden.');
+                const prefix = state.organization.teamGroupPrefix || '';
+                showNotice(`Keine Assistenzteam-Gruppe mit dem konfigurierten Präfix ${prefix} gefunden.`);
                 renderPanel();
             }
         } catch (e) {
@@ -104,6 +107,7 @@
         const data = await repository.state();
         state.currentUser = data.currentUser || state.currentUser;
         state.teams = data.teams || [];
+        state.organization = data.organization || state.organization;
         if (!state.teams.some(team => team.code === state.selectedTeamCode)) {
             state.selectedTeamCode = state.teams.length ? state.teams[0].code : '';
         }
@@ -158,7 +162,7 @@
                 await loadMonth();
             }
         } catch (e) {
-            showError(e, 'Aktion konnte nicht ausgefuehrt werden.');
+            showError(e, 'Aktion konnte nicht ausgeführt werden.');
         } finally {
             renderPanel();
         }
