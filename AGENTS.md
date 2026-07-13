@@ -26,7 +26,7 @@ Kernprozess:
 - Zuweisungen je Schicht folgen der Rollenlogik: eigene Eintraege durch Assistenz, fremde Zuweisungen nur durch EB.
 - EB-Konten selbst sind nicht schichtfaehig.
 - Jahres-Urlaubsplanung zeigt alle Tage als Spalten und Assistenzkraefte als Zeilen. Sie verwendet die kanonische API und Persistenz der separaten App `adurlaub`.
-- Urlaubswuensche sind globale Eintraege pro Person und in allen Teams der Person sichtbar; `adp_vacation_requests` bleibt nur als temporaere Rueckbaureserve und darf nicht mehr ueber aktive AdPlaner-Routen beschrieben werden.
+- Urlaubswuensche sind globale Eintraege pro Person und in allen Teams der Person sichtbar; Persistenz und Schreib-API liegen ausschließlich in `adurlaub`.
 - Optionale Urlaubssichtbarkeit laeuft ueber `ad-ASN-<Kuerzel>-Urlaub`; ohne diese Gruppe wird die Assistenznehmer-Gruppe selbst verwendet.
 - Statuswechsel wie `planned` und `approved` erfolgen nur durch EB.
 

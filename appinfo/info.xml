@@ -5,7 +5,7 @@
     <name>Assistenz Dienst- und Urlaubsplanung</name>
     <summary>Wunschdienstplanung mit gemeinsamer Urlaubsansicht für Assistenzteams.</summary>
     <description>Verwaltet monatliche Wunschdienstpläne für Assistenzteams und bindet die zentrale Jahresurlaubssicht aus AD Urlaub ein.</description>
-    <version>0.1.7</version>
+    <version>0.1.8</version>
     <licence>agpl</licence>
     <author>Simon / ChatGPT-Prototyp</author>
     <namespace>AdPlaner</namespace>

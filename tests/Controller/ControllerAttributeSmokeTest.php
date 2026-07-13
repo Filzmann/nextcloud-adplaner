@@ -58,10 +58,6 @@ namespace {
         'saveDayNote',
         'addShiftCandidate',
         'removeShiftCandidate',
-        'yearVacation',
-        'createVacationRequest',
-        'deleteVacationRequest',
-        'setVacationStatus',
     ];
 
     foreach ($apiActions as $action) {

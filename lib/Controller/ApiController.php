@@ -9,7 +9,6 @@ use OCA\AdPlaner\Service\AdPlanerLogger;
 use OCA\AdPlaner\Service\ScheduleService;
 use OCA\AdPlaner\Service\TeamAccessService;
 use OCA\AdPlaner\Service\TeamSettingsService;
-use OCA\AdPlaner\Service\VacationService;
 use OCA\LocalBase\Controller\ApiResponder;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -22,7 +21,6 @@ class ApiController extends Controller {
         private TeamAccessService $teamAccess,
         private TeamSettingsService $teamSettings,
         private ScheduleService $scheduleService,
-        private VacationService $vacationService,
         private AdPlanerLogger $logger,
         private ApiResponder $responder
     ) {
@@ -146,48 +144,6 @@ class ApiController extends Controller {
             'team_code' => $teamCode,
             'month' => $month,
             'slot_id' => $slotId,
-        ]);
-    }
-
-    #[NoAdminRequired]
-    public function yearVacation(string $teamCode, int $year): DataResponse {
-        return $this->responder->respond(function () use ($teamCode, $year): array {
-            $team = $this->teamAccess->assertTeamAccess($teamCode);
-
-            return $this->vacationService->yearPlan($team, $year, $this->teamAccess->currentUserId());
-        }, [$this->logger, 'error'], 'year_vacation', ['team_code' => $teamCode, 'year' => $year]);
-    }
-
-    #[NoAdminRequired]
-    public function createVacationRequest(string $dateFrom, string $dateTo, string $note = ''): DataResponse {
-        return $this->responder->respond(function () use ($dateFrom, $dateTo, $note): array {
-            $id = $this->vacationService->createVacationRequest($this->teamAccess->currentUserId(), $dateFrom, $dateTo, $note);
-
-            return ['ok' => true, 'id' => $id];
-        }, [$this->logger, 'error'], 'create_vacation_request');
-    }
-
-    #[NoAdminRequired]
-    public function deleteVacationRequest(int $requestId): DataResponse {
-        return $this->responder->respond(function () use ($requestId): array {
-            $this->vacationService->deleteOwnRequest($this->teamAccess->currentUserId(), $requestId);
-
-            return ['ok' => true];
-        }, [$this->logger, 'error'], 'delete_vacation_request', ['request_id' => $requestId]);
-    }
-
-    #[NoAdminRequired]
-    public function setVacationStatus(string $teamCode, int $year, string $assistantUid, string $date, string $status): DataResponse {
-        return $this->responder->respond(function () use ($teamCode, $assistantUid, $date, $status): array {
-            $team = $this->teamAccess->assertCanCoordinate($teamCode);
-            $this->vacationService->setStatusForDate($team, $assistantUid, $date, $status, $this->teamAccess->currentUserId());
-
-            return ['ok' => true];
-        }, [$this->logger, 'error'], 'set_vacation_status', [
-            'team_code' => $teamCode,
-            'year' => $year,
-            'assistant_uid' => $assistantUid,
-            'date' => $date,
         ]);
     }
 

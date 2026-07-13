@@ -69,21 +69,6 @@ class Version000001Date202607020001 extends SimpleMigrationStep {
             $table->addUniqueIndex(['team_code', 'work_date'], 'adp_day_note_unique');
         }
 
-        if (!$schema->hasTable('adp_vacation_requests')) {
-            $table = $schema->createTable('adp_vacation_requests');
-            $table->addColumn('id', Types::BIGINT, ['autoincrement' => true, 'notnull' => true]);
-            $table->addColumn('assistant_uid', Types::STRING, ['notnull' => true, 'length' => 64]);
-            $table->addColumn('date_from', Types::STRING, ['notnull' => true, 'length' => 10]);
-            $table->addColumn('date_to', Types::STRING, ['notnull' => true, 'length' => 10]);
-            $table->addColumn('status', Types::STRING, ['notnull' => true, 'length' => 32, 'default' => 'planned']);
-            $table->addColumn('note', Types::TEXT, ['notnull' => false]);
-            $table->addColumn('created_at', Types::DATETIME, ['notnull' => true]);
-            $table->addColumn('updated_at', Types::DATETIME, ['notnull' => true]);
-            $table->addColumn('updated_by_uid', Types::STRING, ['notnull' => false, 'length' => 64]);
-            $table->setPrimaryKey(['id']);
-            $table->addIndex(['assistant_uid', 'date_from', 'date_to'], 'adp_vac_user_dates');
-        }
-
         return $schema;
     }
 }
