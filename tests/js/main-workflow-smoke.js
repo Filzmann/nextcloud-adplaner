@@ -115,6 +115,9 @@ class FakePlanRepository {
 
 window.ADPlaner.repositories = { PlanRepository: FakePlanRepository };
 
+require('../../js/components/plan-chrome.js');
+require('../../js/components/plan-panel.js');
+require('../../js/modules/plan-app.js');
 require('../../js/main.js');
 
 async function flush() {

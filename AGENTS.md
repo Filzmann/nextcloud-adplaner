@@ -74,6 +74,7 @@ Die folgenden IDs sind initiale Standardwerte. Assistenzteam-Präfix, sichtbarer
 - Bereichszuordnungen werden app-uebergreifend separat als `ad-Bereich-<Name>` gepflegt; kombinierte Rollen-/Bereichsgruppen werden dynamisch abgeleitet.
 - AdPlaner und AD Urlaub verwenden dieselben Assistenzteam-Gruppen; separate Suffix-Gruppen werden nicht unterstützt.
 - Schichten werden ausschließlich über die strukturierte Schichtkonfiguration verwaltet. Frühere einzelne Legacy-Parameter für Früh-, Spät- oder Nachtschichten werden nicht weitergeführt.
+- Die Schichtkonfiguration eines Assistenzteams ist eine delegierte fachliche Teamkonfiguration und wird durch die zuständige EB im AdPlaner gepflegt. Sie ist keine ausschließlich für Nextcloud-Admins bestimmte organisationsweite Einstellung und gehört deshalb nicht in den Suite-Adminbereich.
 
 ## Architekturregeln
 

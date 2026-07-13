@@ -1,6 +1,6 @@
 # adplaner 0.1.6
 
-Nextcloud-App-Prototyp fuer Dienstplaene und Urlaubsplanung in Assistenzteams.
+Nextcloud-App-Prototyp für die Wunschdienstplanung in Assistenzteams. Urlaubsplanung liegt ausschließlich in der separaten App `adurlaub`.
 
 ## Status
 
@@ -8,19 +8,16 @@ Development-Prototyp. Nicht produktiv und nicht rechtssicher.
 
 Enthalten:
 
-- Assistenznehmer aus Nextcloud-Gruppen `ad-ASN-<Kuerzel>`, zum Beispiel `ad-ASN-TeamB`, `ad-ASN-TeamA` oder `ad-ASN-TeamC`.
-- EB-Recht fuer Nutzer*innen, die zugleich im Team und in der gemeinsamen Rollengruppe `ad-EB` sind.
-- Monatlicher Wunschplan mit variabler Schichtliste; Standard ist 08-14, 14-20 und 20-08, Luecken und Ueberlappungen sind moeglich.
-- Zuweisungen je Schicht: eigene Eintraege durch Assistenz, fremde Zuweisungen nur durch EB; EB-Konten selbst sind nicht schichtfaehig.
-- Jahres-Urlaubsplan mit allen Tagen als Spalten und Assistenzkraeften als Zeilen.
-- Urlaubswuensche als globale Eintraege pro Assistenz, sichtbar in allen Teams der Person.
-- Optionale Urlaubssichtbarkeit ueber `ad-ASN-<Kuerzel>-Urlaub`; ohne diese Gruppe wird die Assistenznehmer-Gruppe selbst verwendet.
+- Assistenzteams aus Nextcloud-Gruppen mit dem gemeinsam konfigurierten Präfix, standardmäßig `ad-ASN-<Kürzel>`.
+- EB-Recht für Nutzer*innen, die zugleich im Team und in der gemeinsam konfigurierten EB-Rollengruppe sind.
+- Monatlicher Wunschplan mit variabler Schichtliste; Standard ist 08–14, 14–20 und 20–08. Lücken und Überschneidungen sind möglich.
+- Zuweisungen je Schicht: eigene Einträge durch Assistenz, fremde Zuweisungen nur durch EB; EB-Konten selbst sind nicht schichtfähig.
+- Urlaub wird aus `adurlaub` gelesen; AdPlaner besitzt keine parallele Urlaubspersistenz und keine zusätzlichen `-Urlaub`-Gruppen.
 - Statuswechsel `planned`/`approved` nur durch EB.
 
 Noch offen:
 
-- Produktive Rechte- und Datenschutzpruefung.
-- Feingranulare Urlaubsteilung, wenn nur ein Tag innerhalb eines Bereichs geaendert wird.
+- Produktive Rechte- und Datenschutzprüfung.
 - Export, Benachrichtigungen und Dienstplan-Festschreibung.
 
 ## Installation
