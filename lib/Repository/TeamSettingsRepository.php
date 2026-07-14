@@ -40,8 +40,8 @@ class TeamSettingsRepository {
                     'team_code' => $qb->createNamedParameter($teamCode),
                     'display_name' => $qb->createNamedParameter($displayName),
                     'settings_json' => $qb->createNamedParameter($json),
-                    'created_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATE),
-                    'updated_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATE),
+                    'created_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
+                    'updated_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
                 ]);
             $qb->executeStatement();
             return;
@@ -51,7 +51,7 @@ class TeamSettingsRepository {
         $qb->update('adp_team_settings')
             ->set('display_name', $qb->createNamedParameter($displayName))
             ->set('settings_json', $qb->createNamedParameter($json))
-            ->set('updated_at', $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATE))
+            ->set('updated_at', $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE))
             ->where($qb->expr()->eq('team_code', $qb->createNamedParameter($teamCode)));
         $qb->executeStatement();
     }

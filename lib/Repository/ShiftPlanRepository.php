@@ -61,8 +61,8 @@ class ShiftPlanRepository {
                 'starts_at' => $qb->createNamedParameter($startsAt),
                 'ends_at' => $qb->createNamedParameter($endsAt),
                 'enabled' => $qb->createNamedParameter($enabled ? 1 : 0, IQueryBuilder::PARAM_INT),
-                'created_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATE),
-                'updated_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATE),
+                'created_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
+                'updated_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
             ]);
         $qb->executeStatement();
 
@@ -76,7 +76,7 @@ class ShiftPlanRepository {
             ->set('starts_at', $qb->createNamedParameter($startsAt))
             ->set('ends_at', $qb->createNamedParameter($endsAt))
             ->set('enabled', $qb->createNamedParameter($enabled ? 1 : 0, IQueryBuilder::PARAM_INT))
-            ->set('updated_at', $qb->createNamedParameter(new DateTimeImmutable(), IQueryBuilder::PARAM_DATE))
+            ->set('updated_at', $qb->createNamedParameter(new DateTimeImmutable(), IQueryBuilder::PARAM_DATETIME_IMMUTABLE))
             ->where($qb->expr()->eq('id', $qb->createNamedParameter($slotId, IQueryBuilder::PARAM_INT)));
         $qb->executeStatement();
     }
@@ -115,7 +115,7 @@ class ShiftPlanRepository {
                 'slot_id' => $qb->createNamedParameter($slotId, IQueryBuilder::PARAM_INT),
                 'assistant_uid' => $qb->createNamedParameter($assistantUid),
                 'created_by_uid' => $qb->createNamedParameter($createdByUid),
-                'created_at' => $qb->createNamedParameter(new DateTimeImmutable(), IQueryBuilder::PARAM_DATE),
+                'created_at' => $qb->createNamedParameter(new DateTimeImmutable(), IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
             ]);
         $qb->executeStatement();
     }
@@ -159,7 +159,7 @@ class ShiftPlanRepository {
                     'work_date' => $qb->createNamedParameter($workDate),
                     'note' => $qb->createNamedParameter($note),
                     'updated_by_uid' => $qb->createNamedParameter($updatedByUid),
-                    'updated_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATE),
+                    'updated_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
                 ]);
             $qb->executeStatement();
             return;
@@ -169,7 +169,7 @@ class ShiftPlanRepository {
         $qb->update('adp_day_notes')
             ->set('note', $qb->createNamedParameter($note))
             ->set('updated_by_uid', $qb->createNamedParameter($updatedByUid))
-            ->set('updated_at', $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATE))
+            ->set('updated_at', $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE))
             ->where($qb->expr()->eq('team_code', $qb->createNamedParameter($teamCode)))
             ->andWhere($qb->expr()->eq('work_date', $qb->createNamedParameter($workDate)));
         $qb->executeStatement();
