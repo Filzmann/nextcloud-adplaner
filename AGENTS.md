@@ -119,6 +119,7 @@ Vor groesseren Refactorings zuerst Charakterisierungstests fuer das bestehende g
 - Tests sind Teil der Architekturarbeit und kein optionaler Nachtrag. Neue oder refaktorierte AdPlaner-Fachlogik bekommt passende Charakterisierungs-, Unit-, Contract- oder Smoke-Tests, bevor darauf weiter aufgebaut wird.
 - Schnelle PHP-Suite: `php tests/run.php`
 - Schnelle JavaScript-Suite: `node tests/run-js.mjs`
+- Authentifizierter DOM-/CSRF-/API-Smoke: `ADP_BASE_URL=... ADP_USER=... ADP_PASSWORD=... tests/http-smoke.sh`
 - Nach LocalBase-Aenderungen mindestens die betroffenen AdPlaner-Smoke-/Contract-Tests laufen lassen.
 - Gemeinsame LocalBase-Test-Helper nutzen, wenn dadurch echte Setup-Duplizierung verschwindet, ohne die Lesbarkeit des einzelnen Tests zu verschlechtern.
 - Bei Controller-, DI-, Migrations- oder Nextcloud-Container-Aenderungen zusaetzlich gezielte DDEV-/`occ`-Checks ausfuehren.
