@@ -11,6 +11,11 @@ use OCA\LocalBase\Organization\AdOrganizationSettingsService;
 use OCP\IGroupManager;
 use OCP\IUserSession;
 
+/**
+ * Zweck: Leitet sichtbare Assistenzteams und EB-Koordinationsrechte aus aktuellen Nextcloud-Gruppen ab.
+ * Zusammenspiel: API/ScheduleService -> TeamAccessService -> gemeinsame Organisationsdefinition und TeamSettingsService.
+ * Vertrag: Deny by default; Teammitgliedschaft und EB-Rolle müssen für Koordinationsrechte gleichzeitig vorliegen.
+ */
 class TeamAccessService {
     public function __construct(
         private IGroupManager $groupManager,
@@ -42,7 +47,10 @@ class TeamAccessService {
             $groupId = (string)$groupId;
             if (!str_starts_with($groupId, $prefix) || $groupId === $prefix) continue;
             $code = substr($groupId, strlen($prefix));
-            try { $teamCodes[] = $this->normalizeTeamCode($code); } catch (\InvalidArgumentException) {}
+            try {
+                $teamCodes[] = $this->normalizeTeamCode($code);
+            } catch (\InvalidArgumentException) {
+            }
         }
 
         $teamCodes = array_values(array_unique($teamCodes));
@@ -166,9 +174,17 @@ class TeamAccessService {
 
     public function organizationContract(): array {
         $definition = $this->definition();
-        return ['teamGroupPrefix' => $definition->teamGroupPrefix(), 'teamLabelPrefix' => $definition->teamLabelPrefix(), 'teamCodeMaxLength' => $definition->teamCodeMaxLength(), 'coordinatorGroupId' => $definition->roleGroupId('eb'), 'coordinatorLabel' => $definition->roleLabel('eb')];
+
+        return [
+            'teamGroupPrefix' => $definition->teamGroupPrefix(),
+            'teamLabelPrefix' => $definition->teamLabelPrefix(),
+            'teamCodeMaxLength' => $definition->teamCodeMaxLength(),
+            'coordinatorGroupId' => $definition->roleGroupId('eb'),
+            'coordinatorLabel' => $definition->roleLabel('eb'),
+        ];
     }
 
-    private function definition(): AdOrganizationDefinition { return $this->organization?->definition() ?? AdOrganizationDefinition::defaults(); }
-
+    private function definition(): AdOrganizationDefinition {
+        return $this->organization?->definition() ?? AdOrganizationDefinition::defaults();
+    }
 }
