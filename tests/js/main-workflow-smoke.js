@@ -139,7 +139,25 @@ async function flush() {
     assert.strictEqual(elements.get('team-select').disabled, false);
     assert.strictEqual(elements.get('month-input').value, '2026-07');
     assert.strictEqual(tabMonth.classList.has('is-active'), true);
+    assert.strictEqual(tabMonth.getAttribute('aria-selected'), 'true');
+    assert.strictEqual(tabSettings.getAttribute('aria-selected'), 'false');
+    assert.strictEqual(elements.get('adp-panel').getAttribute('aria-labelledby'), 'tab-month');
     assert(elements.get('adp-panel').innerHTML.includes('TeamA:2026-07'));
+
+    let prevented = false;
+    await tabs.listeners.keydown({
+        target: tabMonth,
+        key: 'ArrowRight',
+        preventDefault() { prevented = true; }
+    });
+    assert.strictEqual(prevented, true);
+    assert.strictEqual(tabSettings.focused, true);
+    assert.strictEqual(tabSettings.getAttribute('aria-selected'), 'true');
+    assert.strictEqual(elements.get('adp-panel').getAttribute('aria-labelledby'), 'tab-settings');
+    assert(elements.get('adp-panel').innerHTML.includes('settings-form'));
+
+    await tabs.listeners.click({ target: tabMonth });
+    assert.strictEqual(tabMonth.getAttribute('aria-selected'), 'true');
 
     await elements.get('team-select').listeners.change({ target: { value: 'TeamB' } });
     assert.deepStrictEqual(repositoryCalls.at(-1), ['monthPlan', 'TeamB', '2026-07']);

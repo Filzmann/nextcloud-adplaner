@@ -44,11 +44,11 @@
         </div>
     </header>
 
-    <nav class="adp-tabs" aria-label="Planbereiche">
-        <button type="button" class="adp-tab is-active" data-view="month">Wunschplan</button>
-        <button type="button" class="adp-tab" data-view="settings">Einstellungen</button>
+    <nav class="adp-tabs" role="tablist" aria-label="Planbereiche">
+        <button type="button" id="adp-tab-month" class="adp-tab is-active" role="tab" aria-controls="adp-panel" aria-selected="true" tabindex="0" data-view="month">Wunschplan</button>
+        <button type="button" id="adp-tab-settings" class="adp-tab" role="tab" aria-controls="adp-panel" aria-selected="false" tabindex="-1" data-view="settings">Einstellungen</button>
     </nav>
 
     <div id="adp-notice" class="adp-notice" hidden></div>
-    <main id="adp-panel" class="adp-panel"></main>
+    <main id="adp-panel" class="adp-panel" role="tabpanel" aria-labelledby="adp-tab-month" tabindex="0"></main>
 </div>
