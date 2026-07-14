@@ -66,7 +66,7 @@ class ShiftPlanRepository {
             ]);
         $qb->executeStatement();
 
-        return (int)$this->db->lastInsertId('adp_shift_slots');
+        return $qb->getLastInsertId();
     }
 
     public function updateSlotDefinition(int $slotId, string $label, string $startsAt, string $endsAt, bool $enabled): void {

@@ -9,7 +9,7 @@ use OCA\LocalBase\Tests\Support\PhpTestRunner;
 PhpTestRunner::run(
     root: dirname(__DIR__),
     lintDirectories: ['appinfo', 'lib', 'templates', 'tests'],
-    testDirectories: ['tests/Controller', 'tests/Service', 'tests/Ui'],
-    testSuffixes: ['SmokeTest.php'],
+    testDirectories: ['tests'],
+    testSuffixes: ['Test.php'],
     successMessage: 'AdPlaner PHP tests passed',
 );
