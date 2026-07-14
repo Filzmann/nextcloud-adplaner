@@ -12,6 +12,10 @@ foreach ([$shiftPlan, $teamSettings] as $source) {
     if (!str_contains($source, 'IQueryBuilder::PARAM_DATETIME_IMMUTABLE') || str_contains($source, 'IQueryBuilder::PARAM_DATE)')) {
         throw new RuntimeException('Repository verwendet nicht durchgängig den unveränderlichen DateTime-Vertrag.');
     }
+    if (!str_contains($source, 'fetchAssociative()') || preg_match('/->fetch(?:All)?\\(\\)/', $source) === 1) {
+        throw new RuntimeException('Repository verwendet noch einen impliziten Ergebnis-Fetch-Modus.');
+    }
 }
+if (!str_contains($shiftPlan, 'fetchAllAssociative()')) throw new RuntimeException('Schichtplanlisten werden nicht explizit assoziativ gelesen.');
 
 echo "AdPlaner repository contract test passed\n";

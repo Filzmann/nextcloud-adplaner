@@ -23,7 +23,7 @@ class ShiftPlanRepository {
             ->orderBy('work_date', 'ASC')
             ->addOrderBy('id', 'ASC');
 
-        return $qb->executeQuery()->fetchAll();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     public function findSlot(int $slotId, string $teamCode, string $month): ?array {
@@ -34,7 +34,7 @@ class ShiftPlanRepository {
             ->andWhere($qb->expr()->eq('team_code', $qb->createNamedParameter($teamCode)))
             ->andWhere($qb->expr()->eq('plan_month', $qb->createNamedParameter($month)));
 
-        $row = $qb->executeQuery()->fetch();
+        $row = $qb->executeQuery()->fetchAssociative();
 
         return $row === false ? null : $row;
     }
@@ -94,7 +94,7 @@ class ShiftPlanRepository {
             ->orderBy('created_at', 'ASC')
             ->addOrderBy('assistant_uid', 'ASC');
 
-        $rows = $qb->executeQuery()->fetchAll();
+        $rows = $qb->executeQuery()->fetchAllAssociative();
         $bySlot = [];
         foreach ($rows as $row) {
             $slotId = (int)$row['slot_id'];
@@ -140,7 +140,7 @@ class ShiftPlanRepository {
             ->andWhere($qb->expr()->lte('work_date', $qb->createNamedParameter($to)));
 
         $notes = [];
-        foreach ($qb->executeQuery()->fetchAll() as $row) {
+        foreach ($qb->executeQuery()->fetchAllAssociative() as $row) {
             $notes[(string)$row['work_date']] = (string)($row['note'] ?? '');
         }
 
@@ -183,7 +183,7 @@ class ShiftPlanRepository {
             ->andWhere($qb->expr()->eq('assistant_uid', $qb->createNamedParameter($assistantUid)))
             ->setMaxResults(1);
 
-        return $qb->executeQuery()->fetch() !== false;
+        return $qb->executeQuery()->fetchAssociative() !== false;
     }
 
     private function findDayNote(string $teamCode, string $workDate): ?array {
@@ -193,7 +193,7 @@ class ShiftPlanRepository {
             ->where($qb->expr()->eq('team_code', $qb->createNamedParameter($teamCode)))
             ->andWhere($qb->expr()->eq('work_date', $qb->createNamedParameter($workDate)));
 
-        $row = $qb->executeQuery()->fetch();
+        $row = $qb->executeQuery()->fetchAssociative();
 
         return $row === false ? null : $row;
     }

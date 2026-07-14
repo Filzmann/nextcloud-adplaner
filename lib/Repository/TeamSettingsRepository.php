@@ -20,7 +20,7 @@ class TeamSettingsRepository {
             ->from('adp_team_settings')
             ->where($qb->expr()->eq('team_code', $qb->createNamedParameter($teamCode)));
 
-        $row = $qb->executeQuery()->fetch();
+        $row = $qb->executeQuery()->fetchAssociative();
 
         return $row === false ? null : $row;
     }
