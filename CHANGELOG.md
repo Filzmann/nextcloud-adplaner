@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0-rc.1
+
+- Eigenständige Navigation ohne OrgSuite ergänzt.
+- Assistenzplanfähigkeit über den optionalen LocalBase-Integrationsvertrag veröffentlicht.
+- Ungültige harte App-Abhängigkeiten aus den Nextcloud-Metadaten entfernt.
+
 ## 0.2.9-rc.1
 
 - Öffentliche Projekt-, Quellcode- und Fehlerkanäle ergänzt.

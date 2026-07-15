@@ -4,12 +4,28 @@ declare(strict_types=1);
 
 namespace OCA\AdPlaner\AppInfo;
 
+use OCA\AdPlaner\Listener\IntegrationCapabilityQueryListener;
+use OCA\AdPlaner\Listener\StandaloneNavigationListener;
+use OCA\LocalBase\Integration\IntegrationCapabilityQueryEvent;
 use OCP\AppFramework\App;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\Navigation\Events\LoadAdditionalEntriesEvent;
 
-class Application extends App {
+/** Zweck: Registriert Assistenzplanfähigkeit und Standalone-Navigation im Nextcloud-Bootstrap. */
+class Application extends App implements IBootstrap {
     public const APP_ID = 'adplaner';
 
     public function __construct(array $urlParams = []) {
         parent::__construct(self::APP_ID, $urlParams);
+    }
+
+    public function register(IRegistrationContext $context): void {
+        $context->registerEventListener(IntegrationCapabilityQueryEvent::class, IntegrationCapabilityQueryListener::class);
+        $context->registerEventListener(LoadAdditionalEntriesEvent::class, StandaloneNavigationListener::class);
+    }
+
+    public function boot(IBootContext $context): void {
     }
 }

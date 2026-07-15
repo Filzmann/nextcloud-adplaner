@@ -101,8 +101,9 @@ Diese Regeln gelten sinngemaess auch fuer andere eigene Nextcloud-Apps; die fach
 
 ### Gemeinsame Suite-Navigation
 
-- AdPlaner besitzt keinen eigenen Nextcloud-Hauptnavigationseintrag. `orgsuite` stellt den gemeinsamen Einstieg `AD` bereit.
-- Das Template bindet das zentrale OrgSuite-Menue mit `data-suite="ad"` und `data-current-app="adplaner"` ein.
+- Ohne aktive OrgSuite registriert AdPlaner einen eigenen Nextcloud-Hauptnavigationseintrag. Ab zwei AD-Produkten ersetzt `orgsuite` diesen durch den gemeinsamen Einstieg `AD`.
+- Das Template stellt den optionalen Menühost mit `data-suite="ad"` und `data-current-app="adplaner"` bereit, lädt aber keine OrgSuite-Assets direkt.
+- Ohne AD Urlaub oder AD Kalender bleibt die Assistenzplanung eigenständig nutzbar; optionale Abwesenheits- und Konflikthinweise dürfen den Monatsplan nicht blockieren.
 - Team- und Planungsrechte bleiben ausschliesslich serverseitig im AdPlaner; Menuesichtbarkeit ist keine Berechtigung.
 - Der deckende Hintergrund und das vertikale Scrolling liegen am App-Root `#adplaner-app`; globale Nextcloud-Container wie `#content` werden nicht ueberschrieben.
 
