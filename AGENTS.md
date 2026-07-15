@@ -73,6 +73,8 @@ Die folgenden IDs sind initiale Standardwerte. Assistenzteam-Präfix, sichtbarer
 - EB-Rechte: Nutzer*innen, die zugleich in der Assistenznehmer-Gruppe und der gemeinsamen Rollengruppe `ad-EB` sind. Rollen-/Bereichskombinationen werden nicht als eigene Gruppen akzeptiert.
 - Bereichszuordnungen werden app-uebergreifend separat als `ad-Bereich-<Name>` gepflegt; kombinierte Rollen-/Bereichsgruppen werden dynamisch abgeleitet.
 - AdPlaner und AD Urlaub verwenden dieselben Assistenzteam-Gruppen; separate Suffix-Gruppen werden nicht unterstützt.
+- Der app-eigene Adminabschnitt installiert Demo-Inhalte nur nach ausdrücklicher Bestätigung. Das Pack legt Team A, Team B und Team C mit ausschließlich synthetischen lokalen Konten und Standardschichten an; WordPress-Bestandsdaten werden nicht importiert.
+- Fremde oder LDAP-verwaltete Konten werden nicht als Demokonten übernommen. Bestehende read-only LDAP-Team- oder Rollengruppen brechen die Demo-Installation im Preflight vor jeder Mutation ab.
 - Schichten werden ausschließlich über die strukturierte Schichtkonfiguration verwaltet. Frühere einzelne Legacy-Parameter für Früh-, Spät- oder Nachtschichten werden nicht weitergeführt.
 - Die Schichtkonfiguration eines Assistenzteams ist eine delegierte fachliche Teamkonfiguration und wird durch die zuständige EB im AdPlaner gepflegt. Sie ist keine ausschließlich für Nextcloud-Admins bestimmte organisationsweite Einstellung und gehört deshalb nicht in den Suite-Adminbereich.
 
@@ -101,8 +103,9 @@ Diese Regeln gelten sinngemaess auch fuer andere eigene Nextcloud-Apps; die fach
 
 ### Gemeinsame Suite-Navigation
 
-- AdPlaner besitzt keinen eigenen Nextcloud-Hauptnavigationseintrag. `orgsuite` stellt den gemeinsamen Einstieg `AD` bereit.
-- Das Template bindet das zentrale OrgSuite-Menue mit `data-suite="ad"` und `data-current-app="adplaner"` ein.
+- Ohne aktive OrgSuite registriert AdPlaner einen eigenen Nextcloud-Hauptnavigationseintrag. Ab zwei AD-Produkten ersetzt `orgsuite` diesen durch den gemeinsamen Einstieg `AD`.
+- Das Template stellt den optionalen Menühost mit `data-suite="ad"` und `data-current-app="adplaner"` bereit, lädt aber keine OrgSuite-Assets direkt.
+- Ohne AD Urlaub oder AD Kalender bleibt die Assistenzplanung eigenständig nutzbar; optionale Abwesenheits- und Konflikthinweise dürfen den Monatsplan nicht blockieren.
 - Team- und Planungsrechte bleiben ausschliesslich serverseitig im AdPlaner; Menuesichtbarkeit ist keine Berechtigung.
 - Der deckende Hintergrund und das vertikale Scrolling liegen am App-Root `#adplaner-app`; globale Nextcloud-Container wie `#content` werden nicht ueberschrieben.
 

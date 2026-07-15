@@ -2,7 +2,6 @@
 \OCP\Util::addScript('localbase', 'api/api-client');
 \OCP\Util::addScript('adplaner', 'modules/api');
 \OCP\Util::addScript('localbase', 'ui/ui');
-\OCP\Util::addScript('orgsuite', 'suite-navigation');
 \OCP\Util::addScript('adplaner', 'modules/ui');
 \OCP\Util::addScript('localbase', 'models/model');
 \OCP\Util::addScript('adplaner', 'models/assistant');
@@ -25,7 +24,6 @@
 \OCP\Util::addScript('adplaner', 'modules/plan-app');
 \OCP\Util::addScript('adplaner', 'main');
 \OCP\Util::addStyle('adplaner', 'style');
-\OCP\Util::addStyle('orgsuite', 'suite-navigation');
 ?>
 
 <div id="adplaner-app">
