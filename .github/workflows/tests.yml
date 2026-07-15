@@ -1,0 +1,64 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php-version }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.3', '8.5']
+    steps:
+      - name: App auschecken
+        uses: actions/checkout@v7
+        with:
+          path: app
+      - name: LocalBase auschecken
+        uses: actions/checkout@v7
+        with:
+          repository: Filzmann/nextcloud-localbase
+          path: localbase
+      - name: PHP einrichten
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: none
+          tools: none
+      - name: PHP-Tests
+        working-directory: app
+        run: php tests/run.php
+
+  javascript:
+    name: JavaScript
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: App auschecken
+        uses: actions/checkout@v7
+        with:
+          path: app
+      - name: LocalBase auschecken
+        uses: actions/checkout@v7
+        with:
+          repository: Filzmann/nextcloud-localbase
+          path: localbase
+      - name: Node.js einrichten
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: JavaScript-Tests
+        working-directory: app
+        run: node tests/run-js.mjs
