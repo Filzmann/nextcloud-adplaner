@@ -18,3 +18,5 @@ sudo -u www-data php occ app:enable adplaner
 ```
 
 Assistenzteams werden aus den zentral konfigurierten Nextcloud-Gruppen abgeleitet. Teambezogene Schichtkonfigurationen werden durch berechtigte Einsatzbegleitungen gepflegt.
+
+Installations-, Betriebs- und Abnahmeunterlagen stehen im öffentlichen [AD-Suite-Projekt](https://github.com/Filzmann/ad-suite).

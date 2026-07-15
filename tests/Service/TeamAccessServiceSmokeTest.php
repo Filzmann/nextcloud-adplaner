@@ -130,7 +130,7 @@ namespace {
         }
 
         public function settingsForTeam(string $teamCode): TeamSettings {
-            return new TeamSettings($teamCode, 'Team ' . $teamCode, ['meetingDay' => '2026-07-15']);
+            return new TeamSettings($teamCode, $teamCode === 'TeamB' ? 'Team B' : $teamCode, ['meetingDay' => '2026-07-15']);
         }
     };
 

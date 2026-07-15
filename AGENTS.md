@@ -68,7 +68,7 @@ Gruppenschema fuer `adplaner`:
 
 Die folgenden IDs sind initiale Standardwerte. Assistenzteam-Präfix, sichtbarer Teamname, maximale Kürzellänge, EB-Rollengruppe und Bereiche stammen aus der gemeinsamen `AdOrganizationDefinition` und dürfen nicht zusätzlich im AdPlaner festverdrahtet werden.
 
-- Assistenznehmer-Gruppen: `ad-ASN-<Kuerzel>`, zum Beispiel `ad-ASN-TeamB`, `ad-ASN-TeamA`, `ad-ASN-TeamC`.
+- Assistenznehmer-Gruppen: `ad-ASN-<Kuerzel>`, zum Beispiel `ad-ASN-TeamA`, `ad-ASN-TeamB`, `ad-ASN-TeamC`.
 - `<Kuerzel>` ist das Kuerzel eines Assistenznehmers und darf Unicode-Buchstaben sowie Ziffern enthalten.
 - EB-Rechte: Nutzer*innen, die zugleich in der Assistenznehmer-Gruppe und der gemeinsamen Rollengruppe `ad-EB` sind. Rollen-/Bereichskombinationen werden nicht als eigene Gruppen akzeptiert.
 - Bereichszuordnungen werden app-uebergreifend separat als `ad-Bereich-<Name>` gepflegt; kombinierte Rollen-/Bereichsgruppen werden dynamisch abgeleitet.

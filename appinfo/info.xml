@@ -5,9 +5,12 @@
     <name>Assistenz Dienstplanung</name>
     <summary>Wunschdienstplanung für Assistenzteams.</summary>
     <description>Verwaltet monatliche Wunschdienstpläne für Assistenzteams auf Basis dynamischer Nextcloud-Gruppen.</description>
-    <version>0.2.8-rc.1</version>
+    <version>0.2.9-rc.1</version>
     <licence>agpl</licence>
     <author>Simon</author>
+    <website>https://github.com/Filzmann/ad-suite</website>
+    <bugs>https://github.com/Filzmann/nextcloud-adplaner/issues</bugs>
+    <repository type="git">https://github.com/Filzmann/nextcloud-adplaner</repository>
     <namespace>AdPlaner</namespace>
     <category>organization</category>
     <dependencies>
