@@ -33,15 +33,12 @@ Offene Zielbereiche:
 - Export, Benachrichtigungen und Dienstplan-Festschreibung.
 - Spaetere Konfigurierbarkeit dort ausbauen, wo konkrete Teams unterschiedliche Regeln brauchen.
 
-## Git- und Arbeitsregeln
+## Repository und gemeinsamer Arbeitsablauf
 
 - Dieses Verzeichnis ist ein eigenstaendiges Git-Repository fuer die AD-App `adplaner`.
 - Andere eigene Nextcloud-Apps, zum Beispiel `brtop`, leben in eigenen Repositories.
-- Keine Commits, kein Push und kein Deployment ohne ausdrueckliche Freigabe durch Simon.
-- Vor Commits immer `git status --short`, `git diff --stat` und `git diff --name-only` zeigen.
-- Nicht `git add .` verwenden; Dateien gezielt stagen.
-- Aenderungen klein, pruefbar und rueckbaubar halten.
-- Fuer groessere Refactorings, neue Datenmodelle oder neue Services soll ein eigener Branch vorgeschlagen werden.
+- Diese Datei und lokal referenzierte Skills bilden bei einem direkten Start in diesem Repository die vollständige Repository-Steuerung.
+- Fuer Git-, Sandbox-, DDEV-/`occ`-Sicherheit, Verifikation und Learning Candidates gilt der lokal mitgefuehrte Skill `work-in-nextcloud-app`; die folgenden AdPlaner-Regeln und Pruefungen ergaenzen ihn.
 
 ## DDEV
 
@@ -57,10 +54,6 @@ Wichtige Pruefungen:
     ddev exec -d /var/www/html/html php occ status
     ddev exec -d /var/www/html/html php occ app:list
     ddev exec -d /var/www/html/html php occ upgrade
-
-Diese lokale Nextcloud-Version hat keinen `occ migrations:migrate`-Befehl. App-Migrationen laufen beim Aktivieren der App bzw. ueber `occ upgrade`, wenn Nextcloud einen DB-Upgrade-Bedarf meldet.
-
-In Codex-Sessions koennen DDEV-Befehle im normalen Sandbox-Kontext nicht zuverlaessig auf Docker zugreifen. Wenn `ddev` mit Docker-/Stream-FD-Fehlern scheitert, den gleichen Befehl mit eskaliertem Zugriff erneut ausfuehren.
 
 ## Fachkontext
 
@@ -109,11 +102,7 @@ Diese Regeln gelten sinngemaess auch fuer andere eigene Nextcloud-Apps; die fach
 - Team- und Planungsrechte bleiben ausschliesslich serverseitig im AdPlaner; Menuesichtbarkeit ist keine Berechtigung.
 - Der deckende Hintergrund und das vertikale Scrolling liegen am App-Root `#adplaner-app`; globale Nextcloud-Container wie `#content` werden nicht ueberschrieben.
 
-- Wenn bei der Arbeit ein echtes, wiederverwendbares Projekt-Learning entsteht, soll Codex vorschlagen, es in dieser `AGENTS.md` zu ergaenzen.
-- Die Ergaenzung erfolgt erst nach ausdruecklicher Freigabe.
-- App-spezifische Learnings werden in diesem App-Repo gespeichert.
-- App-uebergreifende Learnings werden im Parent-Workspace dokumentiert und bei Bedarf in die App-`AGENTS.md` uebertragen.
-- Neue Regeln muessen dort stehen, wo sie gebraucht werden: AdPlaner-Fachlogik hier, DDEV-/Repo-/Neue-App-Regeln im Parent bzw. in allen betroffenen App-Repos.
+- App-spezifische Kandidaten zielen auf diese Datei; app-uebergreifende Kandidaten werden dem Parent nur als unverbindlicher Vorschlag berichtet. Bewertung und Freigabe folgen dem lokalen Skill `work-in-nextcloud-app`.
 
 ## Tests
 
