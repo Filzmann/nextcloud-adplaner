@@ -12,6 +12,8 @@ Nextcloud-App-ID:
 
     adplaner
 
+Die priorisierte Produktplanung und offene Entscheidungen stehen in `ROADMAP.md`; verbindliche Fach-, Sicherheits- und Architekturregeln bleiben in dieser Datei.
+
 ## Zielsetzung
 
 AdPlaner bildet die Wunschdienstplanung in Assistenzteams ab. Urlaubsplanung gehört ausschließlich in die separate App `adurlaub`.
@@ -29,9 +31,7 @@ Kernprozess:
 
 Offene Zielbereiche:
 
-- Produktive Rechte- und Datenschutzpruefung.
-- Export, Benachrichtigungen und Dienstplan-Festschreibung.
-- Spaetere Konfigurierbarkeit dort ausbauen, wo konkrete Teams unterschiedliche Regeln brauchen.
+- Produktive Rechte- und Datenschutzpruefung, Export, Benachrichtigungen, Dienstplan-Festschreibung und spaetere bedarfsgesteuerte Konfigurierbarkeit sind in `ROADMAP.md` gebuendelt.
 
 ## Repository und gemeinsamer Arbeitsablauf
 
