@@ -42,9 +42,10 @@ Offene Zielbereiche:
 
 ## DDEV
 
-Die gemeinsame lokale Nextcloud-DDEV-Umgebung liegt ausserhalb dieses Repos:
-
-    ~/projects/br-nextcloud-apps/nextcloud-dev
+Die gemeinsame Nextcloud-DDEV-Umgebung wird aus dem dokumentierten
+Parent-Unterverzeichnis `nextcloud-dev` gesteuert. Bei einem eigenständigen
+Checkout ist der lokale DDEV-Pfad zuerst anhand der realen Umgebung zu
+ermitteln.
 
 AdPlaner nutzt gemeinsame Basisbausteine aus der Hilfsapp `localbase`. In der lokalen Nextcloud muss `localbase` aktiviert sein, bevor AdPlaner vollstaendig lauffaehig ist.
 
@@ -73,28 +74,18 @@ Die folgenden IDs sind initiale Standardwerte. Assistenzteam-Präfix, sichtbarer
 
 ## Architekturregeln
 
-- Controller bleiben duenn.
-- Fachlogik, Datenzugriff, Darstellung und Dateiablage werden getrennt.
-- Wiederkehrende Logik wird nicht mehrfach in Controllern oder `main.js` dupliziert.
-- Persistente Kernobjekte bekommen Modelle/DTOs oder Value Objects.
-- Modelle/DTOs werden bei Neu- und Weiterentwicklungen in PHP und JavaScript einheitlich angefasst: `get(...)` fuer ein einzelnes Payload/Row/Objekt, `get_all([...])` fuer Listen, `toArray()` fuer Serialisierung und `save()` nur fuer wirklich persistierbare, store-gebundene Modelle. Nicht persistierbare DTOs duerfen `save()` bewusst mit klarer Fehlermeldung blockieren.
-- Modell-Hydration wird von aussen ueber `get(...)` und `get_all([...])` aufgerufen. Hilfsmethoden wie `fromArray` oder `fromRow` bleiben, falls noetig, interne/protected Implementierungsdetails und sind keine oeffentliche Modell-API.
-- Neue Modellarbeit fuehrt keine neuen `fromApi`-/`toApi`-Kompatibilitaetsaliase ein. Bestehende PHP-`toApiArray()`-Call-sites duerfen schrittweise auf `toArray()` migriert werden, wenn die betroffene Schicht ohnehin angefasst wird.
-- Datenzugriffe laufen ueber Repository-, Store- oder Service-Klassen.
-- Services arbeiten bevorzugt mit Modellen/DTOs statt rohen Arrays.
-- Groessere HTML-Bloecke werden aus `templates/index.php` in Partials ausgelagert.
-- Wiederkehrende Frontend-Logik wird in `js/components/`, `js/modules/` oder `js/repositories/` ausgelagert.
-- JavaScript wird gut gekapselt, wiederverwendbar und weitgehend objektorientiert strukturiert. API-Zugriffe gehoeren in Repositories/API-Adapter, Daten in Modelle/ViewModels, Workflows in kleine Services/Controller und Rendering/Eventbindung in Komponenten.
-- DRY und KISS gelten gemeinsam: echte Duplizierung wird entfernt, aber einfache Lesbarkeit und klare AdPlaner-Fachgrenzen bleiben wichtiger als fruehe generische Abstraktionen.
-- Gemeinsame UI-Helfer oder Komponenten werden erst nach `localbase` verschoben, wenn sie in mindestens zwei Apps dieselbe Semantik, dieselben Zustaende, Events und Accessibility-Regeln haben.
-- Fehler werden zentral protokolliert; Nutzer*innen erhalten sichere, knappe Meldungen ohne interne Details.
-- Keine Architekturabstraktion wird vorsorglich gebaut. Auslagerung erfolgt, wenn sie konkrete Duplizierung, Testbarkeit oder Wartbarkeit verbessert.
+- Der lokale Skill `work-in-nextcloud-app` ist die kanonische Quelle für
+  gemeinsame Schichtungs-, Modell-, Sicherheits-, UI- und Testregeln.
+- Teambezogene Schichtkonfiguration bleibt ein AdPlaner-Fachvertrag und wird
+  durch die zuständige EB gepflegt; sie wird nicht in eine allgemeine
+  Suite-Einstellung verschoben.
+- AdPlaner-spezifische API-Pfade, Modelle, Workflows und Darstellung bleiben
+  in diesem Repository.
+- Gemeinsame Bausteine werden erst nach LocalBase verschoben, wenn mindestens
+  zwei Apps denselben semantischen und testbaren Vertrag benötigen.
+- WordPress-Kompatibilität und parallele Urlaubspersistenz sind unzulässig.
 
-Diese Regeln gelten sinngemaess auch fuer andere eigene Nextcloud-Apps; die fachlichen Anwendungsfaelle bleiben aber getrennt.
-
-## Learnings pflegen
-
-### Gemeinsame Suite-Navigation
+## Verbindliche Navigation und optionale Integration
 
 - Ohne aktive OrgSuite registriert AdPlaner einen eigenen Nextcloud-Hauptnavigationseintrag. Ab zwei AD-Produkten ersetzt `orgsuite` diesen durch den gemeinsamen Einstieg `AD`.
 - Das Template stellt den optionalen Menühost mit `data-suite="ad"` und `data-current-app="adplaner"` bereit, lädt aber keine OrgSuite-Assets direkt.
@@ -102,7 +93,6 @@ Diese Regeln gelten sinngemaess auch fuer andere eigene Nextcloud-Apps; die fach
 - Team- und Planungsrechte bleiben ausschliesslich serverseitig im AdPlaner; Menuesichtbarkeit ist keine Berechtigung.
 - Der deckende Hintergrund und das vertikale Scrolling liegen am App-Root `#adplaner-app`; globale Nextcloud-Container wie `#content` werden nicht ueberschrieben.
 
-- App-spezifische Kandidaten zielen auf diese Datei; app-uebergreifende Kandidaten werden dem Parent nur als unverbindlicher Vorschlag berichtet. Bewertung und Freigabe folgen dem lokalen Skill `work-in-nextcloud-app`.
 
 ## Tests
 
