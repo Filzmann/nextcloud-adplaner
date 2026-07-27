@@ -61,4 +61,30 @@ assertSameValue(false, $customSegments[2]['enabled'], 'Disabled custom shifts sh
 assertSameValue(28, count($days), 'February 2026 should have 28 days.');
 assertSameValue('2026-02-01', $days[0]['date'], 'First month day should be correct.');
 
+$assertInvalidArgument = static function (callable $operation, string $message): void {
+    try {
+        $operation();
+    } catch (\InvalidArgumentException) {
+        return;
+    }
+
+    throw new \RuntimeException($message);
+};
+$assertInvalidArgument(
+    static fn() => $service->normalize(['shifts' => 'invalid']),
+    'Non-list shift settings should be rejected.'
+);
+$assertInvalidArgument(
+    static fn() => $service->monthDays('2026-13'),
+    'Out-of-range months should be rejected.'
+);
+$assertInvalidArgument(
+    static fn() => $service->normalizeDate('2026-02-30'),
+    'Impossible calendar dates should be rejected.'
+);
+$assertInvalidArgument(
+    static fn() => $service->normalizeDate('30.02.2026'),
+    'Non-ISO calendar dates should be rejected.'
+);
+
 echo 'AdPlaner shift config smoke tests passed' . PHP_EOL;

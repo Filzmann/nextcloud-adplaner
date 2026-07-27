@@ -9,7 +9,7 @@ Diese Datei bündelt geplante Erweiterungen und offene Produktentscheidungen. Ve
 
 ## Geplante Erweiterungen
 
-- Dienstplanexport.
+- Persönliche Monatsansicht „Alle meine Einsätze“ mit PDF-Export und optionaler Verbindung zu gängigen Kalendern.
 - Benachrichtigungen für relevante Planungs- und Statusänderungen.
 - Fachlich eindeutige Festschreibung eines Dienstplans.
 - Teambezogene Konfigurierbarkeit nur dort erweitern, wo konkrete Teams unterschiedliche Regeln benötigen.
