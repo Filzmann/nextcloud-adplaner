@@ -146,9 +146,29 @@ namespace {
     assertSameValue(['Alice Assistenz', 'Bob EB'], array_map(static fn($assistant): string => $assistant->displayName, $team->assistants()), 'Assistants should be sorted by display name.');
     assertSameValue(false, $team->assistantByUid('bob')->canReceiveShifts, 'EB users should not receive shifts.');
     assertSameValue(['alice' => 'Alice Assistenz', 'bob' => 'Bob EB'], $service->assistantLabelMap($team->assistants()), 'Assistant label maps should expose display names by uid.');
+    assertSameValue(
+        ['carla' => 'Carla Assistenz'],
+        $service->assistantLabelMap([['uid' => 'carla', 'displayName' => 'Carla Assistenz']]),
+        'Assistant label maps should normalize array input.'
+    );
+    assertSameValue(
+        [
+            'teamGroupPrefix' => 'ad-ASN-',
+            'teamLabelPrefix' => 'Assistenzteam',
+            'teamCodeMaxLength' => 16,
+            'coordinatorGroupId' => 'ad-EB',
+            'coordinatorLabel' => 'Einsatzbegleitung',
+        ],
+        $service->organizationContract(),
+        'The public organization contract should expose the shared defaults.'
+    );
 
     $service->assertCanCoordinate('TeamB');
     $service->assertAssistantInTeam('TeamB', 'alice');
+    assertDomainException(
+        static fn() => $service->assertAssistantInTeam('TeamB', 'missing'),
+        'Assistants outside the selected team should be rejected.'
+    );
     assertDomainException(
         static fn() => $service->assertTeamAccess('Missing'),
         'Missing teams should not be accessible.'
@@ -167,6 +187,17 @@ namespace {
 
     $session->setUser(null);
     assertSameValue([], $service->teamsForCurrentUser(), 'Anonymous sessions should not expose teams.');
+    assertSameValue(false, $service->currentUserIsEbForTeam('TeamB'), 'Anonymous sessions should not receive EB rights.');
+    assertDomainException(
+        static fn() => $service->assertTeamAccess('TeamB'),
+        'Anonymous sessions should not access an existing team.'
+    );
+    try {
+        $service->currentUserId();
+        throw new RuntimeException('Anonymous sessions received a user id.');
+    } catch (RuntimeException $error) {
+        assertSameValue('Nicht angemeldet.', $error->getMessage(), 'Anonymous sessions should fail closed.');
+    }
 
     echo 'TeamAccessService smoke tests passed' . PHP_EOL;
 }
