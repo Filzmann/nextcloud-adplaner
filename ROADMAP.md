@@ -2,6 +2,24 @@
 
 Diese Datei bündelt geplante Erweiterungen und offene Produktentscheidungen. Verbindliche Fach-, Sicherheits- und Architekturregeln stehen in `AGENTS.md`.
 
+## Freigegebene Umsetzungsaufgaben
+
+### ADP-L10N – Assistenzplanung vollständig lokalisieren
+
+Status: als l10n-Pilot geeignet
+
+- Manuelle Monats-/Wochentagsnamen und sichtbare UI-, Status-, Validierungs-
+  und Fehlermeldungen auf aktive Nextcloud-Locale und Nextcloud-l10n
+  umstellen.
+- ISO-Daten, Monatsnummern, Schichtzeiten, Statuswerte, Teamcodes und
+  API-Schlüssel unverändert lassen; Abkürzungen nicht durch Abschneiden
+  bilden.
+- Deutsche Ausgabe, eine weitere Locale, Fallback, Monats-/Jahresgrenzen,
+  Pluralformen, Platzhalter und Escaping in PHP und JavaScript testen.
+- Erst nach vollständiger Pilotmigration den app-eigenen Rohtext-Check
+  verbindlich schalten und seinen Vertrag für die weiteren Apps
+  dokumentieren.
+
 ## Aktueller Fokus
 
 - Produktive Rechte- und Datenschutzprüfung der Wunschdienstplanung.
