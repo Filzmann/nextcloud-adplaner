@@ -21,4 +21,8 @@ Assistenzteams werden aus den zentral konfigurierten Nextcloud-Gruppen abgeleite
 
 Geplante Erweiterungen und offene Produktentscheidungen stehen in der [Roadmap](ROADMAP.md).
 
+Für die fachliche, visuelle und sicherheitsbezogene Staging-Prüfung steht ein
+ausfüllbares [manuelles Abnahmeformular](docs/manual-acceptance.md) bereit.
+Zugangsdaten und personenbezogene Echtdaten werden darin nicht dokumentiert.
+
 Installations-, Betriebs- und Abnahmeunterlagen stehen im öffentlichen [AD-Suite-Projekt](https://github.com/Filzmann/ad-suite).

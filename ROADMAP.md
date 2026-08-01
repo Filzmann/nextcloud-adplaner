@@ -22,6 +22,8 @@ Status: als l10n-Pilot geeignet
 
 ## Aktueller Fokus
 
+- Die manuellen Prüfungen werden im ausfüllbaren
+  [`docs/manual-acceptance.md`](docs/manual-acceptance.md) dokumentiert.
 - Produktive Rechte- und Datenschutzprüfung der Wunschdienstplanung.
 - Monatsplan, variable Schichten, EB-Koordination und Standalone-Betrieb auf einem realitätsnahen Staging fachlich abnehmen.
 
