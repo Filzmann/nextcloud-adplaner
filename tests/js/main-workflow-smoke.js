@@ -8,6 +8,8 @@ const {
 const elements = createElementMap([
     'team-select',
     'month-input',
+    'month-prev',
+    'month-next',
     'adp-panel',
 ]);
 const tabs = new FakeElement('tabs');
@@ -111,6 +113,10 @@ class FakePlanRepository {
         repositoryCalls.push(['addSelf', teamCode, month, slotId]);
     }
 
+    async transitionStatus(teamCode, month, targetStatus) {
+        repositoryCalls.push(['transitionStatus', teamCode, month, targetStatus]);
+    }
+
 }
 
 window.ADPlaner.repositories = { PlanRepository: FakePlanRepository };
@@ -138,6 +144,13 @@ async function flush() {
     assert(!elements.get('team-select').innerHTML.includes('Team <A>'));
     assert.strictEqual(elements.get('team-select').disabled, false);
     assert.strictEqual(elements.get('month-input').value, '2026-07');
+
+    await elements.get('month-prev').listeners.click();
+    assert.strictEqual(elements.get('month-input').value, '2026-06');
+    assert.deepStrictEqual(repositoryCalls.at(-1), ['monthPlan', 'TeamA', '2026-06']);
+    await elements.get('month-next').listeners.click();
+    assert.strictEqual(elements.get('month-input').value, '2026-07');
+    assert.deepStrictEqual(repositoryCalls.at(-1), ['monthPlan', 'TeamA', '2026-07']);
     assert.strictEqual(tabMonth.classList.has('is-active'), true);
     assert.strictEqual(tabMonth.getAttribute('aria-selected'), 'true');
     assert.strictEqual(tabSettings.getAttribute('aria-selected'), 'false');
@@ -174,6 +187,17 @@ async function flush() {
         ['monthPlan', 'TeamB', '2026-07']
     ]);
     assert.deepStrictEqual(errors, []);
+
+    await elements.get('adp-panel').listeners.click({
+        target: new FakeButton({
+            action: 'transition-status',
+            targetStatus: 'planned'
+        })
+    });
+    assert.deepStrictEqual(repositoryCalls.slice(-2), [
+        ['transitionStatus', 'TeamB', '2026-07', 'planned'],
+        ['monthPlan', 'TeamB', '2026-07']
+    ]);
 
     console.log('AdPlaner main workflow smoke test passed.');
 })().catch((error) => {

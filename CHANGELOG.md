@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0-rc.1
+
+- Kontrollierte Monatsplanstatus `draft`, `planned` und `approved` ergänzt; nur die zuständige Einsatzbegleitung darf wechseln und genehmigte Pläne sind gegen Änderungen gesperrt.
+- Optionale, datensparsame Urlaubs- und Kalenderhinweise über die öffentlichen LocalBase-Verträge eingebunden; fehlende Provider bleiben ein gültiger Standalone-Zustand.
+- Direkte Navigation zum vorherigen und nächsten Monat sowie sichtbarer Tabellen-Scrollbereich und fixierte Bemerkungsspalte ergänzt.
+- Additive Monatsplanstatus-Migration sowie automatisierte Service-, UI-, Migrations-, Datenbank- und DDEV-Rechteprüfungen ergänzt.
+
 ## 0.3.0-rc.1
 
 - Eigenständige Navigation ohne OrgSuite ergänzt.

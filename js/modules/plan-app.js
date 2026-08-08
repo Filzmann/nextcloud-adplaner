@@ -83,6 +83,7 @@
                     if (!select || select.disabled || !select.value) return;
                     await this.repository.addSelected(team, month, slot, select.value);
                 } else if (action === 'remove-candidate') await this.repository.removeCandidate(team, month, slot, button.dataset.targetUid || '');
+                else if (action === 'transition-status') await this.repository.transitionStatus(team, month, button.dataset.targetStatus || '');
                 else if (action === 'save-note') {
                     const textarea = this.panel.panel.querySelector(`textarea[data-note-date="${CSS.escape(button.dataset.date)}"]`);
                     await this.repository.saveDayNote(team, month, button.dataset.date, textarea ? textarea.value : '');

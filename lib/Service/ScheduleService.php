@@ -10,16 +10,24 @@ use OCA\AdPlaner\Model\Team;
 use OCA\AdPlaner\Store\ShiftPlanStore;
 
 class ScheduleService {
+    private const STATUS_DRAFT = 'draft';
+    private const STATUS_PLANNED = 'planned';
+    private const STATUS_APPROVED = 'approved';
+
     public function __construct(
         private ShiftPlanStore $store,
         private ShiftConfigService $shiftConfig,
-        private TeamAccessService $teamAccess
+        private TeamAccessService $teamAccess,
+        private PlanningHintService $planningHints
     ) {
     }
 
     public function monthPlan(Team $team, string $month, string $currentUid): array {
         $month = $this->shiftConfig->normalizeMonth($month);
-        $this->ensureMonthSlots($team, $month);
+        $status = $this->store->monthStatus($team->code, $month);
+        if ($status !== self::STATUS_APPROVED) {
+            $this->ensureMonthSlots($team, $month);
+        }
 
         $slots = $this->store->slotsForMonth($team->code, $month);
         $enabledSlots = array_values(array_filter($slots, static fn(ShiftSlot $slot): bool => $slot->enabled));
@@ -27,6 +35,7 @@ class ScheduleService {
         $assistantLabels = $team->assistantLabelMap();
         $assignableUids = $team->assignableAssistantUidMap();
         $notes = $this->store->dayNotesForMonth($team->code, $month);
+        $hints = $this->planningHints->forMonth($month, array_keys($assignableUids));
         $slotsByDate = [];
 
         foreach ($enabledSlots as $slot) {
@@ -47,12 +56,17 @@ class ScheduleService {
                 'weekday' => $day['weekday'],
                 'slots' => $slotsByDate[$date] ?? [],
                 'note' => isset($notes[$date]) ? $notes[$date]->note : '',
+                'hints' => array_map(static function (array $hint) use ($assistantLabels): array {
+                    $hint['displayName'] = $assistantLabels[$hint['employeeUid']] ?? $hint['employeeUid'];
+                    return $hint;
+                }, $hints[$date] ?? []),
             ];
         }
 
         return [
             'team' => $team->toArray(),
             'month' => $month,
+            'status' => $status,
             'segments' => array_values(array_filter($this->shiftConfig->segments($team->settings), static fn(array $segment): bool => $segment['enabled'])),
             'days' => $days,
         ];
@@ -60,6 +74,7 @@ class ScheduleService {
 
     public function addCandidate(Team $team, string $month, int $slotId, string $targetUid, string $currentUid): void {
         $month = $this->shiftConfig->normalizeMonth($month);
+        $this->assertMonthMutable($team->code, $month);
         $slot = $this->requireSlot($slotId, $team->code, $month);
         if ($targetUid === '') {
             if ($team->isEb) {
@@ -77,6 +92,7 @@ class ScheduleService {
 
     public function removeCandidate(Team $team, string $month, int $slotId, string $targetUid, string $currentUid): void {
         $month = $this->shiftConfig->normalizeMonth($month);
+        $this->assertMonthMutable($team->code, $month);
         $slot = $this->requireSlot($slotId, $team->code, $month);
         $targetUid = $targetUid === '' ? $currentUid : $targetUid;
 
@@ -92,7 +108,31 @@ class ScheduleService {
         }
 
         $workDate = $this->shiftConfig->normalizeDate($workDate);
+        $this->assertMonthMutable($team->code, substr($workDate, 0, 7));
         $this->store->saveDayNote($team->code, $workDate, trim($note), $currentUid);
+    }
+
+    public function transitionMonthStatus(Team $team, string $month, string $targetStatus, string $currentUid): string {
+        if (!$team->isEb) {
+            throw new \DomainException('Nur die Einsatzbegleitung darf den Planstatus ändern.');
+        }
+
+        $month = $this->shiftConfig->normalizeMonth($month);
+        $targetStatus = strtolower(trim($targetStatus));
+        $currentStatus = $this->store->monthStatus($team->code, $month);
+        $allowedTargets = [
+            self::STATUS_DRAFT => [self::STATUS_PLANNED],
+            self::STATUS_PLANNED => [self::STATUS_DRAFT, self::STATUS_APPROVED],
+            self::STATUS_APPROVED => [self::STATUS_PLANNED],
+        ];
+        if (!in_array($targetStatus, $allowedTargets[$currentStatus] ?? [], true)) {
+            throw new \DomainException('Dieser Planstatuswechsel ist nicht erlaubt.');
+        }
+        if (!$this->store->transitionMonthStatus($team->code, $month, $currentStatus, $targetStatus, $currentUid)) {
+            throw new \DomainException('Der Planstatus wurde zwischenzeitlich geändert. Bitte neu laden.');
+        }
+
+        return $targetStatus;
     }
 
     private function ensureMonthSlots(Team $team, string $month): void {
@@ -186,6 +226,12 @@ class ScheduleService {
 
         if (!$assistant->canReceiveShifts) {
             throw new \DomainException('Einsatzbegleitungen können keiner Schicht zugeteilt werden.');
+        }
+    }
+
+    private function assertMonthMutable(string $teamCode, string $month): void {
+        if ($this->store->monthStatus($teamCode, $month) === self::STATUS_APPROVED) {
+            throw new \DomainException('Der genehmigte Monatsplan ist gegen Änderungen gesperrt.');
         }
     }
 }

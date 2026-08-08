@@ -58,6 +58,7 @@ namespace {
         'saveDayNote',
         'addShiftCandidate',
         'removeShiftCandidate',
+        'transitionMonthStatus',
     ];
 
     foreach ($apiActions as $action) {

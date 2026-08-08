@@ -45,6 +45,26 @@ class ShiftPlanStore {
         return $notes;
     }
 
+    public function monthStatus(string $teamCode, string $month): string {
+        return $this->repository->monthStatus($teamCode, $month) ?? 'draft';
+    }
+
+    public function transitionMonthStatus(
+        string $teamCode,
+        string $month,
+        string $expectedStatus,
+        string $targetStatus,
+        string $updatedByUid
+    ): bool {
+        return $this->repository->transitionMonthStatus(
+            $teamCode,
+            $month,
+            $expectedStatus,
+            $targetStatus,
+            $updatedByUid
+        );
+    }
+
     public function insertSlot(
         string $teamCode,
         string $month,

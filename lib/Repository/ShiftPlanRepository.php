@@ -175,6 +175,53 @@ class ShiftPlanRepository {
         $qb->executeStatement();
     }
 
+    public function monthStatus(string $teamCode, string $month): ?string {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('status')
+            ->from('adp_month_plans')
+            ->where($qb->expr()->eq('team_code', $qb->createNamedParameter($teamCode)))
+            ->andWhere($qb->expr()->eq('plan_month', $qb->createNamedParameter($month)));
+        $row = $qb->executeQuery()->fetchAssociative();
+
+        return $row === false ? null : (string)$row['status'];
+    }
+
+    public function transitionMonthStatus(
+        string $teamCode,
+        string $month,
+        string $expectedStatus,
+        string $targetStatus,
+        string $updatedByUid
+    ): bool {
+        $now = new DateTimeImmutable();
+        if ($this->monthStatus($teamCode, $month) === null) {
+            if ($expectedStatus !== 'draft') {
+                return false;
+            }
+            $qb = $this->db->getQueryBuilder();
+            $qb->insert('adp_month_plans')->values([
+                'team_code' => $qb->createNamedParameter($teamCode),
+                'plan_month' => $qb->createNamedParameter($month),
+                'status' => $qb->createNamedParameter($targetStatus),
+                'updated_by_uid' => $qb->createNamedParameter($updatedByUid),
+                'updated_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
+            ]);
+
+            return $qb->executeStatement() === 1;
+        }
+
+        $qb = $this->db->getQueryBuilder();
+        $qb->update('adp_month_plans')
+            ->set('status', $qb->createNamedParameter($targetStatus))
+            ->set('updated_by_uid', $qb->createNamedParameter($updatedByUid))
+            ->set('updated_at', $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE))
+            ->where($qb->expr()->eq('team_code', $qb->createNamedParameter($teamCode)))
+            ->andWhere($qb->expr()->eq('plan_month', $qb->createNamedParameter($month)))
+            ->andWhere($qb->expr()->eq('status', $qb->createNamedParameter($expectedStatus)));
+
+        return $qb->executeStatement() === 1;
+    }
+
     private function candidateExists(int $slotId, string $assistantUid): bool {
         $qb = $this->db->getQueryBuilder();
         $qb->select('id')

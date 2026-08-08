@@ -11,11 +11,15 @@
             this.onViewChange = options.onViewChange;
             this.teamSelect = this.byId('team-select');
             this.monthInput = this.byId('month-input');
+            this.monthPrevious = this.byId('month-prev');
+            this.monthNext = this.byId('month-next');
             this.panel = this.byId('adp-panel');
             this.tabs = document.querySelector('.adp-tabs');
             this.tabButtons = Array.from(document.querySelectorAll('.adp-tab'));
             this.teamSelect.addEventListener('change', event => this.onTeamChange(event.target.value));
             this.monthInput.addEventListener('change', event => this.onMonthChange(event.target.value));
+            this.monthPrevious.addEventListener('click', () => this.onMonthChange(this.offsetMonth(this.monthInput.value, -1)));
+            this.monthNext.addEventListener('click', () => this.onMonthChange(this.offsetMonth(this.monthInput.value, 1)));
             this.tabs.addEventListener('click', event => {
                 const button = event.target instanceof Element ? event.target.closest('button[data-view]') : null;
                 if (button) return this.onViewChange(button.dataset.view || 'month');
@@ -35,6 +39,13 @@
                 next.focus();
                 return this.onViewChange(next.dataset.view || 'month');
             });
+        }
+
+        offsetMonth(month, delta) {
+            const match = /^(\d{4})-(\d{2})$/.exec(month || '');
+            if (!match) return month;
+            const value = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1 + delta, 1));
+            return `${value.getUTCFullYear()}-${String(value.getUTCMonth() + 1).padStart(2, '0')}`;
         }
 
         render(state) {

@@ -6,6 +6,7 @@ return [
 
         ['name' => 'api#state', 'url' => '/api/state', 'verb' => 'GET'],
         ['name' => 'api#monthPlan', 'url' => '/api/teams/{teamCode}/months/{month}', 'verb' => 'GET'],
+        ['name' => 'api#transitionMonthStatus', 'url' => '/api/teams/{teamCode}/months/{month}/status', 'verb' => 'POST'],
         ['name' => 'api#saveTeamSettings', 'url' => '/api/teams/{teamCode}/settings', 'verb' => 'POST'],
         ['name' => 'api#saveDayNote', 'url' => '/api/teams/{teamCode}/months/{month}/days/{workDate}/note', 'verb' => 'POST'],
         ['name' => 'api#addShiftCandidate', 'url' => '/api/teams/{teamCode}/months/{month}/slots/{slotId}/candidates', 'verb' => 'POST'],

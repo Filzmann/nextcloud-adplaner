@@ -13,6 +13,7 @@ require __DIR__ . '/../../lib/Model/Team.php';
 require __DIR__ . '/../../lib/Repository/ShiftPlanRepository.php';
 require __DIR__ . '/../../lib/Service/ShiftConfigService.php';
 require __DIR__ . '/../../lib/Service/TeamAccessService.php';
+require __DIR__ . '/../../lib/Service/PlanningHintService.php';
 require __DIR__ . '/../../lib/Service/ScheduleService.php';
 require __DIR__ . '/../../lib/Store/ShiftPlanStore.php';
 
@@ -22,6 +23,7 @@ use OCA\AdPlaner\Model\Team;
 use OCA\AdPlaner\Service\ScheduleService;
 use OCA\AdPlaner\Service\ShiftConfigService;
 use OCA\AdPlaner\Service\TeamAccessService;
+use OCA\AdPlaner\Service\PlanningHintService;
 use OCA\AdPlaner\Store\ShiftPlanStore;
 use function OCA\AdPlaner\Tests\assertDomainException;
 use function OCA\AdPlaner\Tests\assertSameValue;
@@ -33,6 +35,10 @@ class FakeShiftPlanStoreForSchedule extends ShiftPlanStore {
     public array $insertedSlots = [];
 
     public function __construct() {
+    }
+
+    public function monthStatus(string $teamCode, string $month): string {
+        return 'draft';
     }
 
     public function slotForMonth(int $slotId, string $teamCode, string $month): ?ShiftSlot {
@@ -117,6 +123,19 @@ class FakeTeamAccessServiceForSchedule extends TeamAccessService {
     }
 }
 
+class FakePlanningHintServiceForSchedule extends PlanningHintService {
+    public function __construct() {}
+    public function forMonth(string $month, array $employeeUids): array {
+        return [$month . '-01' => [[
+            'employeeUid' => 'assistant-a',
+            'type' => 'absence',
+            'marker' => 'U?',
+            'label' => 'Urlaub',
+            'blocks' => false,
+        ]]];
+    }
+}
+
 $assistants = [
     ['uid' => 'assistant-a', 'displayName' => 'Assistant A', 'isEb' => false, 'canReceiveShifts' => true],
     ['uid' => 'test-eb', 'displayName' => 'Test EB', 'isEb' => true, 'canReceiveShifts' => false],
@@ -139,7 +158,7 @@ $mappedTeam = Team::get($ebTeam->toArray());
 assertSameValue('Team A1', $mappedTeam->toArray()['displayName'], 'Team::get should keep the API payload shape.');
 
 $store = new FakeShiftPlanStoreForSchedule();
-$service = new ScheduleService($store, new ShiftConfigService(), new FakeTeamAccessServiceForSchedule());
+$service = new ScheduleService($store, new ShiftConfigService(), new FakeTeamAccessServiceForSchedule(), new FakePlanningHintServiceForSchedule());
 
 $service->addCandidate($assistantTeam, '2026-07', 9, '', 'assistant-a');
 assertSameValue('assistant-a', $store->added[0]['assistantUid'] ?? null, 'Assistant should be able to add themself.');
@@ -163,6 +182,7 @@ assertDomainException(
 $plan = $service->monthPlan($ebTeam, '2026-07', 'test-eb');
 $slotCandidates = $plan['days'][0]['slots'][0]['candidates'] ?? [];
 assertSameValue(['assistant-a'], array_column($slotCandidates, 'uid'), 'Month plan should hide non-assignable EB candidates.');
+assertSameValue('Assistant A', $plan['days'][0]['hints'][0]['displayName'] ?? null, 'Planning hints use the visible team label without exposing foreign details.');
 
 $configuredStore = new FakeShiftPlanStoreForSchedule();
 $configuredStore->slots = [
@@ -176,7 +196,7 @@ $configuredTeam = new Team('A1', 'ad-ASN-A1', 'Team A1', $assistants, true, [
         ['key' => 'night', 'label' => 'Nacht', 'startsAt' => '20:00', 'endsAt' => '08:00', 'enabled' => false],
     ],
 ]);
-$configuredService = new ScheduleService($configuredStore, new ShiftConfigService(), new FakeTeamAccessServiceForSchedule());
+$configuredService = new ScheduleService($configuredStore, new ShiftConfigService(), new FakeTeamAccessServiceForSchedule(), new FakePlanningHintServiceForSchedule());
 $configuredPlan = $configuredService->monthPlan($configuredTeam, '2026-07', 'test-eb');
 $updatesById = [];
 foreach ($configuredStore->updatedSlots as $updatedSlot) {

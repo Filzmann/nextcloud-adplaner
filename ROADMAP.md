@@ -31,11 +31,9 @@ Status: als l10n-Pilot geeignet
 
 - Persönliche Monatsansicht „Alle meine Einsätze“ mit PDF-Export und optionaler Verbindung zu gängigen Kalendern.
 - Benachrichtigungen für relevante Planungs- und Statusänderungen.
-- Fachlich eindeutige Festschreibung eines Dienstplans.
 - Teambezogene Konfigurierbarkeit nur dort erweitern, wo konkrete Teams unterschiedliche Regeln benötigen.
 
 ## Vor der Umsetzung zu klären
 
 - Exportformate, Zielsysteme und Datenschutzumfang.
 - Benachrichtigungskanäle, Empfänger*innen und auslösende Ereignisse.
-- Bedeutung, Rechte und Rückbau einer Festschreibung sowie der Umgang mit späteren Änderungen.

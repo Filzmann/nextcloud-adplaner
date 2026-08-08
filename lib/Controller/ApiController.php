@@ -56,6 +56,25 @@ class ApiController extends Controller {
     }
 
     #[NoAdminRequired]
+    public function transitionMonthStatus(string $teamCode, string $month, string $targetStatus): DataResponse {
+        return $this->responder->respond(function () use ($teamCode, $month, $targetStatus): array {
+            $team = $this->teamAccess->assertCanCoordinate($teamCode);
+            $status = $this->scheduleService->transitionMonthStatus(
+                $team,
+                $month,
+                $targetStatus,
+                $this->teamAccess->currentUserId()
+            );
+
+            return ['ok' => true, 'status' => $status];
+        }, [$this->logger, 'error'], 'transition_month_status', [
+            'team_code' => $teamCode,
+            'month' => $month,
+            'target_status' => $targetStatus,
+        ]);
+    }
+
+    #[NoAdminRequired]
     public function saveTeamSettings(
         string $teamCode,
         string $displayName = '',

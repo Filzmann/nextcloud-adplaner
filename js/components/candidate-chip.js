@@ -1,8 +1,8 @@
 (function() {
     const { esc } = window.ADPlaner.ui;
 
-    function render(candidate, canCoordinate, slotId) {
-        const removable = canCoordinate || candidate.isSelf;
+    function render(candidate, canCoordinate, slotId, mutable = true) {
+        const removable = mutable && (canCoordinate || candidate.isSelf);
 
         return `
             <span class="adp-chip">
