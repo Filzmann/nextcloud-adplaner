@@ -126,3 +126,23 @@ Begründung verpflichtend.
 8. **C3 – Serverseitige Rechteprüfung nachholen**
    - Fremdänderung durch ein normales Teammitglied über einen direkten API-Aufruf versuchen.
    - Verifizieren, dass der Server die Änderung abweist und der bestehende Eintrag unverändert bleibt.
+
+## Automatisierter Nachweis nach der historischen Abnahme
+
+Die vorstehenden Ergebnisse und die Gesamtentscheidung bleiben als historischer
+manueller Stand vom 02.08.2026 unverändert. Für `0.4.0-rc.1` sind B7 und D3
+technisch umgesetzt und durch Service-, API-, JavaScript- und Layouttests
+abgesichert: Die zuständige EB kann ausschließlich die erlaubten Übergänge
+`draft` → `planned` → `approved` sowie die ausdrücklichen Rückwege ausführen,
+ein genehmigter Monatsplan ist serverseitig und in der Oberfläche gesperrt,
+und optionale Urlaubs-/Kalenderhinweise bleiben read-only. Der reale
+DDEV-Integrationslauf belegt Statuspersistenz und unzulässige Übergänge gegen
+die Nextcloud-34-Datenbank. Die selbstbereinigende DDEV-Rechtematrix deckt den
+direkten serverseitigen Negativfall aus C3 ab.
+
+Auch die technischen Korrekturen zu A4 und A6 sind automatisiert belegt:
+direkte Vor-/Zurücknavigation und ein begrenzter, horizontal wie vertikal
+scrollbarer Plan-Viewport mit sichtbarer rechter Aktionsspalte. Die manuelle
+visuelle und fachliche Wiederholungsabnahme sowie die konkrete fachliche
+Wirkung der optionalen Hinweise auf Wünsche und Zuweisungen bleiben vor einer
+Produktfreigabe erforderlich.
