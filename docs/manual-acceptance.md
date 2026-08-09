@@ -146,3 +146,36 @@ scrollbarer Plan-Viewport mit sichtbarer rechter Aktionsspalte. Die manuelle
 visuelle und fachliche Wiederholungsabnahme sowie die konkrete fachliche
 Wirkung der optionalen Hinweise auf Wünsche und Zuweisungen bleiben vor einer
 Produktfreigabe erforderlich.
+
+Für `0.4.0-rc.2` belegen zusätzliche Repository-, Service-, Routen- und
+JavaScript-Tests die Serialisierung konkurrierender Planänderungen, strikte
+Eingabegrenzen, idempotente Erstschreibvorgänge, das datensparsame Entfernen
+geleerter Tagesbemerkungen, ausschließlich aktuell schichtfähige Personen in
+öffentlichen Teamantworten sowie UID-freie read-only Planungshinweise. Der
+technische Monats-Lock verändert keine personenbezogenen fachlichen
+Änderungsmetadaten. Unbekannte Planstatus bleiben auch in der Oberfläche
+gesperrt; Tabellenüberschriften und Bemerkungsfelder sind programmatisch
+beschriftet. Diese automatisierten Nachweise ersetzen die ausstehende visuelle
+und fachliche Wiederholungsabnahme nicht.
+
+Ein zusätzlicher selbstbereinigender Nextcloud-34-DDEV-Smoke bestätigt diese
+Datenschutzverträge über den echten Gruppen-, HTTP-/CSRF- und Datenbankpfad:
+Deaktivierte Konten und EB-Konten werden nicht als schichtfähig ausgeliefert,
+das Leeren einer Tagesbemerkung entfernt deren Datenbankzeile, und technische
+Monats-Locks überschreiben keine fachlichen Änderungsmetadaten. Die getrennte
+Cleanup-Nachprüfung fand anschließend weder synthetische AdPlaner-Daten noch
+die temporären Konten oder die temporäre Gruppe.
+
+Eine selbstbereinigende Headless-Chrome-Wiederholungsabnahme belegt zusätzlich
+die gerenderte und interaktive Oberfläche in Nextcloud 34 mit einem
+synthetischen EB- und einem normalen Teamkonto. Geprüft wurden direkte
+Monatsnavigation, Tastaturwechsel der Tabs, Fremdzuweisung durch EB, eigener
+Wunsch, persistierte Tagesbemerkung und Schichtkonfiguration, die Übergänge
+`draft` → `planned` → `approved` einschließlich Sperre und ausdrücklichem
+Entsperren, schreibgeschützte Einstellungen für normale Mitglieder sowie das
+reale vertikale und horizontale Scrollverhalten bei schmalem Viewport. Ein
+temporärer Sichtnachweis wurde nur im Testverzeichnis unter `/tmp` erzeugt und
+mit dem Browserprofil gelöscht. Eine unabhängige Nachprüfung fand danach keine
+synthetischen Konten oder über deren Bearbeiterkennung auffindbaren Plan- und
+Bemerkungsdaten. Nicht Bestandteil dieses Laufs war das Umschalten von
+OrgSuite oder optionalen Provider-Apps.

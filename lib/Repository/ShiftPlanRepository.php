@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\AdPlaner\Repository;
 
 use DateTimeImmutable;
+use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
@@ -12,6 +13,25 @@ class ShiftPlanRepository {
     public function __construct(
         private IDBConnection $db
     ) {
+    }
+
+    public function transactional(callable $operation): mixed {
+        if ($this->db->inTransaction()) {
+            return $operation();
+        }
+
+        $this->db->beginTransaction();
+        try {
+            $result = $operation();
+            $this->db->commit();
+
+            return $result;
+        } catch (\Throwable $exception) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $exception;
+        }
     }
 
     public function findSlotsForMonth(string $teamCode, string $month): array {
@@ -117,7 +137,13 @@ class ShiftPlanRepository {
                 'created_by_uid' => $qb->createNamedParameter($createdByUid),
                 'created_at' => $qb->createNamedParameter(new DateTimeImmutable(), IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
             ]);
-        $qb->executeStatement();
+        try {
+            $qb->executeStatement();
+        } catch (Exception $exception) {
+            if ($exception->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+                throw $exception;
+            }
+        }
     }
 
     public function removeCandidate(int $slotId, string $assistantUid): void {
@@ -161,8 +187,14 @@ class ShiftPlanRepository {
                     'updated_by_uid' => $qb->createNamedParameter($updatedByUid),
                     'updated_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
                 ]);
-            $qb->executeStatement();
-            return;
+            try {
+                $qb->executeStatement();
+                return;
+            } catch (Exception $exception) {
+                if ($exception->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+                    throw $exception;
+                }
+            }
         }
 
         $qb = $this->db->getQueryBuilder();
@@ -170,6 +202,14 @@ class ShiftPlanRepository {
             ->set('note', $qb->createNamedParameter($note))
             ->set('updated_by_uid', $qb->createNamedParameter($updatedByUid))
             ->set('updated_at', $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE))
+            ->where($qb->expr()->eq('team_code', $qb->createNamedParameter($teamCode)))
+            ->andWhere($qb->expr()->eq('work_date', $qb->createNamedParameter($workDate)));
+        $qb->executeStatement();
+    }
+
+    public function deleteDayNote(string $teamCode, string $workDate): void {
+        $qb = $this->db->getQueryBuilder();
+        $qb->delete('adp_day_notes')
             ->where($qb->expr()->eq('team_code', $qb->createNamedParameter($teamCode)))
             ->andWhere($qb->expr()->eq('work_date', $qb->createNamedParameter($workDate)));
         $qb->executeStatement();
@@ -184,6 +224,58 @@ class ShiftPlanRepository {
         $row = $qb->executeQuery()->fetchAssociative();
 
         return $row === false ? null : (string)$row['status'];
+    }
+
+    public function ensureMonthStatus(string $teamCode, string $month, string $updatedByUid): void {
+        if ($this->monthStatus($teamCode, $month) !== null) {
+            return;
+        }
+
+        $qb = $this->db->getQueryBuilder();
+        $qb->insert('adp_month_plans')->values([
+            'team_code' => $qb->createNamedParameter($teamCode),
+            'plan_month' => $qb->createNamedParameter($month),
+            'status' => $qb->createNamedParameter('draft'),
+            'revision' => $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT),
+            'updated_by_uid' => $qb->createNamedParameter($updatedByUid),
+            'updated_at' => $qb->createNamedParameter(new DateTimeImmutable(), IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
+        ]);
+
+        try {
+            $qb->executeStatement();
+        } catch (Exception $exception) {
+            if ($exception->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+                throw $exception;
+            }
+        }
+    }
+
+    public function lockMonthStatus(
+        string $teamCode,
+        string $month,
+        array $expectedStatuses
+    ): ?string {
+        $expectedStatuses = array_values(array_unique(array_map('strval', $expectedStatuses)));
+        if ($expectedStatuses === []) {
+            return null;
+        }
+
+        $qb = $this->db->getQueryBuilder();
+        $statusConditions = array_map(
+            fn(string $status) => $qb->expr()->eq('status', $qb->createNamedParameter($status)),
+            $expectedStatuses
+        );
+        $qb->update('adp_month_plans')
+            ->set('revision', $qb->createFunction('revision + 1'))
+            ->where($qb->expr()->eq('team_code', $qb->createNamedParameter($teamCode)))
+            ->andWhere($qb->expr()->eq('plan_month', $qb->createNamedParameter($month)))
+            ->andWhere($qb->expr()->orX(...$statusConditions));
+
+        if ($qb->executeStatement() !== 1) {
+            return null;
+        }
+
+        return $this->monthStatus($teamCode, $month);
     }
 
     public function transitionMonthStatus(
@@ -203,6 +295,7 @@ class ShiftPlanRepository {
                 'team_code' => $qb->createNamedParameter($teamCode),
                 'plan_month' => $qb->createNamedParameter($month),
                 'status' => $qb->createNamedParameter($targetStatus),
+                'revision' => $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT),
                 'updated_by_uid' => $qb->createNamedParameter($updatedByUid),
                 'updated_at' => $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
             ]);

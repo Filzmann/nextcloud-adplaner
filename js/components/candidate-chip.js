@@ -3,11 +3,12 @@
 
     function render(candidate, canCoordinate, slotId, mutable = true) {
         const removable = mutable && (canCoordinate || candidate.isSelf);
+        const displayName = candidate.displayName || candidate.uid;
 
         return `
             <span class="adp-chip">
-                ${esc(candidate.displayName || candidate.uid)}
-                ${removable ? `<button type="button" title="Entfernen" data-action="remove-candidate" data-slot-id="${esc(slotId)}" data-target-uid="${esc(candidate.uid)}">x</button>` : ''}
+                ${esc(displayName)}
+                ${removable ? `<button type="button" aria-label="${esc(displayName)} entfernen" data-action="remove-candidate" data-slot-id="${esc(slotId)}" data-target-uid="${esc(candidate.uid)}">&times;</button>` : ''}
             </span>
         `;
     }

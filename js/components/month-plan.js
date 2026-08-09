@@ -12,8 +12,8 @@
         const team = plan.team;
         const segments = plan.segments || [];
         const canCoordinate = !!team.canCoordinate;
-        const status = plan.status || 'draft';
-        const mutable = status !== 'approved';
+        const status = typeof plan.status === 'string' ? plan.status : '';
+        const mutable = status === 'draft' || status === 'planned';
 
         return `
             <section class="adp-section">
@@ -28,9 +28,9 @@
                     <table class="adp-table adp-month-table">
                         <thead>
                             <tr>
-                                <th>Tag</th>
-                                ${segments.map(segment => `<th>${esc(segment.label)}<small>${esc(segment.startsAt)}-${esc(segment.endsAt)}</small></th>`).join('')}
-                                <th>Bemerkungen</th>
+                                <th scope="col">Tag</th>
+                                ${segments.map(segment => `<th scope="col">${esc(segment.label)}<small>${esc(segment.startsAt)}-${esc(segment.endsAt)}</small></th>`).join('')}
+                                <th scope="col">Bemerkungen</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -63,7 +63,7 @@
 
         return `
             <tr>
-                <th class="adp-day">${dayHeader(day)}<small>${esc(dateShort(day.date))}</small>${renderHints(day.hints || [])}</th>
+                <th scope="row" class="adp-day">${dayHeader(day)}<small>${esc(dateShort(day.date))}</small>${renderHints(day.hints || [])}</th>
                 ${segments.map(segment => slotCell(slotsByKey[segment.key], team, currentUser, canCoordinate, mutable)).join('')}
                 <td class="adp-note-cell">${renderDayNoteControl(day, canCoordinate && mutable)}</td>
             </tr>

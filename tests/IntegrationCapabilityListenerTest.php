@@ -6,9 +6,7 @@ namespace OCP\EventDispatcher { class Event { public function __construct() {} }
 namespace OCA\AdPlaner\AppInfo { final class Application { public const APP_ID = 'adplaner'; } }
 
 namespace {
-    require_once __DIR__ . '/../../localbase/lib/Integration/AdIntegrationCapabilities.php';
-    require_once __DIR__ . '/../../localbase/lib/Integration/IntegrationCapabilityQueryEvent.php';
-    require_once __DIR__ . '/../lib/Listener/IntegrationCapabilityQueryListener.php';
+    require_once __DIR__ . '/bootstrap.php';
 
     use OCA\AdPlaner\Listener\IntegrationCapabilityQueryListener;
     use OCA\LocalBase\Integration\AdIntegrationCapabilities;

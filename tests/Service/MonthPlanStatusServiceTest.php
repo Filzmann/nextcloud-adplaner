@@ -2,17 +2,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/helpers.php';
-require __DIR__ . '/../../../localbase/lib/Model/ModelApiTrait.php';
-require __DIR__ . '/../../lib/Model/Assistant.php';
-require __DIR__ . '/../../lib/Model/ShiftDefinition.php';
-require __DIR__ . '/../../lib/Model/ShiftSlot.php';
-require __DIR__ . '/../../lib/Model/Team.php';
-require __DIR__ . '/../../lib/Service/ShiftConfigService.php';
-require __DIR__ . '/../../lib/Service/TeamAccessService.php';
-require __DIR__ . '/../../lib/Service/PlanningHintService.php';
-require __DIR__ . '/../../lib/Service/ScheduleService.php';
-require __DIR__ . '/../../lib/Store/ShiftPlanStore.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 
 use OCA\AdPlaner\Model\ShiftSlot;
 use OCA\AdPlaner\Model\Team;
@@ -29,6 +19,10 @@ final class MonthPlanStatusStoreFake extends ShiftPlanStore {
     public array $statuses = [];
     public array $added = [];
     public array $updatedSlots = [];
+    public array $insertedSlots = [];
+    public int $transactionCalls = 0;
+    public bool $rejectNextTransition = false;
+    public array $candidatesBySlot = [];
 
     public function __construct() {}
 
@@ -37,12 +31,41 @@ final class MonthPlanStatusStoreFake extends ShiftPlanStore {
     }
 
     public function transitionMonthStatus(string $teamCode, string $month, string $expectedStatus, string $targetStatus, string $updatedByUid): bool {
+        if ($this->rejectNextTransition) {
+            $this->rejectNextTransition = false;
+            return false;
+        }
         $key = $teamCode . '|' . $month;
         if ($this->monthStatus($teamCode, $month) !== $expectedStatus) {
             return false;
         }
         $this->statuses[$key] = $targetStatus;
         return true;
+    }
+
+    public function ensureMonthStatus(string $teamCode, string $month, string $updatedByUid): void {
+        $this->statuses[$teamCode . '|' . $month] ??= 'draft';
+    }
+
+    public function lockMonthStatus(string $teamCode, string $month, array $expectedStatuses): ?string {
+        $status = $this->monthStatus($teamCode, $month);
+
+        return in_array($status, $expectedStatuses, true) ? $status : null;
+    }
+
+    public function transactional(callable $operation): mixed {
+        $this->transactionCalls++;
+        $statuses = $this->statuses;
+        $updatedSlots = $this->updatedSlots;
+        $insertedSlots = $this->insertedSlots;
+        try {
+            return $operation();
+        } catch (\Throwable $exception) {
+            $this->statuses = $statuses;
+            $this->updatedSlots = $updatedSlots;
+            $this->insertedSlots = $insertedSlots;
+            throw $exception;
+        }
     }
 
     public function slotForMonth(int $slotId, string $teamCode, string $month): ?ShiftSlot {
@@ -53,7 +76,7 @@ final class MonthPlanStatusStoreFake extends ShiftPlanStore {
         return [new ShiftSlot(1, $teamCode, $month, $month . '-01', 'early', 'Früh', '08:00', '14:00', true)];
     }
 
-    public function candidatesForSlotIds(array $slotIds): array { return []; }
+    public function candidatesForSlotIds(array $slotIds): array { return $this->candidatesBySlot; }
     public function dayNotesForMonth(string $teamCode, string $month): array { return []; }
 
     public function addCandidate(int $slotId, string $assistantUid, string $createdByUid): void {
@@ -74,7 +97,17 @@ final class MonthPlanStatusStoreFake extends ShiftPlanStore {
         string $endsAt,
         bool $enabled
     ): int {
-        return 100;
+        $this->insertedSlots[] = compact(
+            'teamCode',
+            'month',
+            'workDate',
+            'segmentKey',
+            'label',
+            'startsAt',
+            'endsAt',
+            'enabled'
+        );
+        return 100 + count($this->insertedSlots);
     }
 }
 
@@ -115,6 +148,13 @@ assertDomainException(
     'A draft plan may not skip the planned state.'
 );
 
+$directStore = new MonthPlanStatusStoreFake();
+$directService = new ScheduleService($directStore, new ShiftConfigService(), new MonthPlanStatusTeamAccessFake(), new MonthPlanStatusHintServiceFake());
+assertSameValue('planned', $directService->transitionMonthStatus($ebTeam, '2026-08', 'planned', 'test-eb'), 'A month can be planned without loading it first.');
+assertSameValue('approved', $directService->transitionMonthStatus($ebTeam, '2026-08', 'approved', 'test-eb'), 'A month can be approved without loading it first.');
+assertSameValue(2, $directStore->transactionCalls, 'Status transitions run through the store transaction boundary.');
+assertSameValue(30, count($directStore->insertedSlots), 'Approval materializes every missing slot before freezing the plan.');
+
 assertSameValue('planned', $service->transitionMonthStatus($ebTeam, '2026-08', 'planned', 'test-eb'), 'EB can mark a draft plan as planned.');
 assertSameValue('approved', $service->transitionMonthStatus($ebTeam, '2026-08', 'approved', 'test-eb'), 'EB can approve a planned plan.');
 assertDomainException(
@@ -122,15 +162,51 @@ assertDomainException(
     'Approved plans reject candidate mutations.'
 );
 assertDomainException(
-    static fn() => $service->saveDayNote($ebTeam, '2026-08-01', 'Gesperrt', 'test-eb'),
+    static fn() => $service->saveDayNote($ebTeam, '2026-08', '2026-08-01', 'Gesperrt', 'test-eb'),
     'Approved plans reject note mutations.'
 );
 
 $store->updatedSlots = [];
 assertSameValue('approved', $service->monthPlan($ebTeam, '2026-08', 'test-eb')['status'] ?? null, 'Approved status remains visible after reload.');
 assertSameValue([], $store->updatedSlots, 'Loading an approved plan does not rewrite frozen slot definitions.');
+$changedSettingsTeam = new Team('A1', 'ad-ASN-A1', 'Team A1', $assistants, true, ['shifts' => [[
+    'key' => 'late',
+    'label' => 'Spät neu',
+    'startsAt' => '14:00',
+    'endsAt' => '20:00',
+    'enabled' => true,
+]]]);
+$approvedSnapshot = $service->monthPlan($changedSettingsTeam, '2026-08', 'test-eb');
+assertSameValue(
+    ['early'],
+    array_column($approvedSnapshot['segments'] ?? [], 'key'),
+    'Approved plans should render the frozen slot segments instead of later team settings.'
+);
+
+$store->candidatesBySlot = [
+    1 => [
+        new \OCA\AdPlaner\Model\ShiftCandidate(1, 1, 'assistant-a', 'test-eb'),
+        new \OCA\AdPlaner\Model\ShiftCandidate(2, 1, 'former-assistant', 'test-eb'),
+    ],
+];
+$privacyMinimizedSnapshot = $service->monthPlan($ebTeam, '2026-08', 'test-eb');
+assertSameValue(
+    ['assistant-a'],
+    array_column($privacyMinimizedSnapshot['days'][0]['slots'][0]['candidates'] ?? [], 'uid'),
+    'Approved plans should expose only currently assignable team members instead of freezing historical person data.'
+);
 
 assertSameValue('planned', $service->transitionMonthStatus($ebTeam, '2026-08', 'planned', 'test-eb'), 'EB has an explicit unlock path back to planned.');
+$insertedBeforeConflict = $store->insertedSlots;
+$updatedBeforeConflict = $store->updatedSlots;
+$store->rejectNextTransition = true;
+assertDomainException(
+    static fn() => $service->transitionMonthStatus($ebTeam, '2026-08', 'approved', 'test-eb'),
+    'A concurrent status conflict rejects approval.'
+);
+assertSameValue('planned', $store->monthStatus('A1', '2026-08'), 'A failed approval keeps the concurrent month status.');
+assertSameValue($insertedBeforeConflict, $store->insertedSlots, 'A failed approval rolls back newly materialized slots.');
+assertSameValue($updatedBeforeConflict, $store->updatedSlots, 'A failed approval rolls back slot-definition updates.');
 $service->addCandidate($ebTeam, '2026-08', 1, 'assistant-a', 'test-eb');
 assertSameValue(1, count($store->added), 'Unlocked plans accept candidate mutations again.');
 assertSameValue('draft', $service->transitionMonthStatus($ebTeam, '2026-08', 'draft', 'test-eb'), 'EB can explicitly reset a planned plan to draft.');

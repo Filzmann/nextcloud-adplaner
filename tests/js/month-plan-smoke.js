@@ -57,6 +57,8 @@ assert(assistantHtml.includes('Team &lt;A1&gt; - 2026-07'));
 assert(!assistantHtml.includes('Team <A1>'));
 assert(assistantHtml.includes('Treffen 15.07.'));
 assert(assistantHtml.includes('Früh &lt;A&gt;'));
+assert(assistantHtml.includes('<th scope="col">Tag</th>'), 'Month-plan column headings need an explicit scope.');
+assert(assistantHtml.includes('<th scope="row" class="adp-day">'), 'Each planning day needs an explicit row heading.');
 assert(assistantHtml.includes('Mi<span>1</span>'));
 assert(assistantHtml.includes('data-action="add-self" data-slot-id="10"'));
 assert(!assistantHtml.includes('data-action="add-self" data-slot-id="11"'));
@@ -85,8 +87,11 @@ const ebHtml = monthPlan.render({
 assert(!ebHtml.includes('data-action="add-self"'));
 assert(ebHtml.includes('adp-assignment-control'));
 assert(ebHtml.includes('data-action="remove-candidate" data-slot-id="11" data-target-uid="assistant-a"'));
-assert(ebHtml.includes('<textarea rows="2" data-note-date="2026-07-01">&lt;Hinweis&gt;</textarea>'));
-assert(ebHtml.includes('value="assistant-b"'));
+assert(ebHtml.includes('aria-label="Assistant A entfernen"'));
+assert(ebHtml.includes('<textarea rows="2" maxlength="2000" aria-label="Bemerkung für 01.07." data-note-date="2026-07-01">&lt;Hinweis&gt;</textarea>'));
+assert(ebHtml.includes('aria-label="Bemerkung für 01.07."'), 'The editable day note needs its own accessible name.');
+assert(ebHtml.includes('aria-label="Bemerkung für 01.07. speichern"'));
+assert(ebHtml.includes('data-action="add-selected" data-slot-id="10" data-target-uid="assistant-b"'));
 assert(ebHtml.includes('Entwurf'));
 assert(ebHtml.includes('data-action="transition-status" data-target-status="planned"'));
 
@@ -106,5 +111,20 @@ assert(approvedHtml.includes('data-action="transition-status" data-target-status
 assert(!approvedHtml.includes('adp-assignment-control'));
 assert(!approvedHtml.includes('data-action="remove-candidate"'));
 assert(!approvedHtml.includes('<textarea'));
+
+const unknownStatusHtml = monthPlan.render({
+    ...basePlan,
+    status: 'unexpected',
+    team: {
+        code: 'A1',
+        displayName: 'Team A1',
+        canCoordinate: true,
+        settings: {},
+        assistants: [{ uid: 'assistant-a', displayName: 'Assistant A', canReceiveShifts: true }]
+    }
+}, { uid: 'eb' });
+assert(!unknownStatusHtml.includes('adp-assignment-control'), 'Unknown plan statuses must fail closed in the assignment UI.');
+assert(!unknownStatusHtml.includes('data-action="remove-candidate"'), 'Unknown plan statuses must not expose candidate mutations.');
+assert(!unknownStatusHtml.includes('<textarea'), 'Unknown plan statuses must not expose day-note mutations.');
 
 console.log('AdPlaner month plan smoke test passed.');

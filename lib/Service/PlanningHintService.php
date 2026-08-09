@@ -12,7 +12,10 @@ use OCP\EventDispatcher\IEventDispatcher;
 
 /** Aggregiert optionale Abwesenheiten und Kalenderbelegungen ohne Schreibwirkung oder fremde Detaildaten. */
 class PlanningHintService {
-    public function __construct(private IEventDispatcher $events) {}
+    public function __construct(
+        private IEventDispatcher $events,
+        private AdPlanerLogger $logger,
+    ) {}
 
     /** @param list<string> $employeeUids
      *  @return array<string, list<array{employeeUid:string,type:string,marker:string,label:string,blocks:bool}>>
@@ -32,31 +35,11 @@ class PlanningHintService {
         $end = $start->modify('+1 month');
         $hints = [];
 
-        $absenceEvent = new AbsenceQueryEvent($start, $end, $employeeUids);
-        $this->events->dispatchTyped($absenceEvent);
-        foreach ($absenceEvent->absences() as $absence) {
-            $payload = $absence->toArray();
-            $this->appendForDays(
-                $hints,
-                new DateTimeImmutable($payload['start']),
-                new DateTimeImmutable($payload['end']),
-                $start,
-                $end,
-                [
-                    'employeeUid' => $payload['employeeUid'],
-                    'type' => 'absence',
-                    'marker' => $payload['marker'],
-                    'label' => 'Urlaub',
-                    'blocks' => false,
-                ]
-            );
-        }
-
-        foreach ($employeeUids as $employeeUid) {
-            $conflictEvent = new ScheduleConflictQueryEvent($employeeUid, $start, $end);
-            $this->events->dispatchTyped($conflictEvent);
-            foreach ($conflictEvent->conflicts() as $conflict) {
-                $payload = $conflict->toArray();
+        try {
+            $absenceEvent = new AbsenceQueryEvent($start, $end, $employeeUids);
+            $this->events->dispatchTyped($absenceEvent);
+            foreach ($absenceEvent->absences() as $absence) {
+                $payload = $absence->toArray();
                 $this->appendForDays(
                     $hints,
                     new DateTimeImmutable($payload['start']),
@@ -64,13 +47,41 @@ class PlanningHintService {
                     $start,
                     $end,
                     [
-                        'employeeUid' => $employeeUid,
-                        'type' => 'calendar',
-                        'marker' => 'K',
-                        'label' => $payload['type'] === 'shift' ? 'Dienst' : 'Termin',
+                        'employeeUid' => $payload['employeeUid'],
+                        'type' => 'absence',
+                        'marker' => $payload['marker'],
+                        'label' => 'Urlaub',
                         'blocks' => false,
                     ]
                 );
+            }
+        } catch (\Throwable $error) {
+            $this->logger->error('planning_hint_absences', $error, ['month' => $month]);
+        }
+
+        foreach ($employeeUids as $employeeUid) {
+            try {
+                $conflictEvent = new ScheduleConflictQueryEvent($employeeUid, $start, $end);
+                $this->events->dispatchTyped($conflictEvent);
+                foreach ($conflictEvent->conflicts() as $conflict) {
+                    $payload = $conflict->toArray();
+                    $this->appendForDays(
+                        $hints,
+                        new DateTimeImmutable($payload['start']),
+                        new DateTimeImmutable($payload['end']),
+                        $start,
+                        $end,
+                        [
+                            'employeeUid' => $employeeUid,
+                            'type' => 'calendar',
+                            'marker' => 'K',
+                            'label' => $payload['type'] === 'shift' ? 'Dienst' : 'Termin',
+                            'blocks' => false,
+                        ]
+                    );
+                }
+            } catch (\Throwable $error) {
+                $this->logger->error('planning_hint_calendar', $error, ['month' => $month]);
             }
         }
 

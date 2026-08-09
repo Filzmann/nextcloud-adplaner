@@ -19,6 +19,8 @@ Assistenzteams werden aus den zentral konfigurierten Nextcloud-Gruppen abgeleite
 
 Die zuständige Einsatzbegleitung führt Monatspläne kontrolliert von `draft` über `planned` nach `approved`. Genehmigte Pläne sind bis zu einer ausdrücklichen Rücknahme gegen Wünsche, Zuweisungen und Bemerkungsänderungen gesperrt. Optionale Urlaubs- und Kalenderprovider liefern ausschließlich datensparsame, schreibgeschützte Planungshinweise.
 
+Genehmigte Pläne frieren die damaligen Schichtdefinitionen ein, speichern aber keine zusätzlichen historischen Personenstammdaten. Zuweisungen werden weiterhin nur für aktuell schichtfähige Mitglieder des jeweiligen Assistenzteams angezeigt.
+
 ## Roadmap
 
 Geplante Erweiterungen und offene Produktentscheidungen stehen in der [Roadmap](ROADMAP.md).

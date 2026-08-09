@@ -13,6 +13,7 @@ class ScheduleService {
     private const STATUS_DRAFT = 'draft';
     private const STATUS_PLANNED = 'planned';
     private const STATUS_APPROVED = 'approved';
+    private const MAX_DAY_NOTE_LENGTH = 2000;
 
     public function __construct(
         private ShiftPlanStore $store,
@@ -26,11 +27,28 @@ class ScheduleService {
         $month = $this->shiftConfig->normalizeMonth($month);
         $status = $this->store->monthStatus($team->code, $month);
         if ($status !== self::STATUS_APPROVED) {
-            $this->ensureMonthSlots($team, $month);
+            $this->store->ensureMonthStatus($team->code, $month, $currentUid);
+            $status = $this->store->transactional(function () use ($team, $month): string {
+                $lockedStatus = $this->store->lockMonthStatus(
+                    $team->code,
+                    $month,
+                    [self::STATUS_DRAFT, self::STATUS_PLANNED]
+                );
+                if ($lockedStatus === null) {
+                    return $this->store->monthStatus($team->code, $month);
+                }
+
+                $this->ensureMonthSlots($team, $month);
+
+                return $lockedStatus;
+            });
         }
 
         $slots = $this->store->slotsForMonth($team->code, $month);
         $enabledSlots = array_values(array_filter($slots, static fn(ShiftSlot $slot): bool => $slot->enabled));
+        $segments = $status === self::STATUS_APPROVED
+            ? $this->segmentsFromFrozenSlots($enabledSlots)
+            : array_values(array_filter($this->shiftConfig->segments($team->settings), static fn(array $segment): bool => $segment['enabled']));
         $candidatesBySlot = $this->store->candidatesForSlotIds(array_map(static fn(ShiftSlot $slot): int => $slot->id, $enabledSlots));
         $assistantLabels = $team->assistantLabelMap();
         $assignableUids = $team->assignableAssistantUidMap();
@@ -57,7 +75,9 @@ class ScheduleService {
                 'slots' => $slotsByDate[$date] ?? [],
                 'note' => isset($notes[$date]) ? $notes[$date]->note : '',
                 'hints' => array_map(static function (array $hint) use ($assistantLabels): array {
-                    $hint['displayName'] = $assistantLabels[$hint['employeeUid']] ?? $hint['employeeUid'];
+                    $employeeUid = (string)($hint['employeeUid'] ?? '');
+                    $hint['displayName'] = $assistantLabels[$employeeUid] ?? '';
+                    unset($hint['employeeUid']);
                     return $hint;
                 }, $hints[$date] ?? []),
             ];
@@ -67,15 +87,13 @@ class ScheduleService {
             'team' => $team->toArray(),
             'month' => $month,
             'status' => $status,
-            'segments' => array_values(array_filter($this->shiftConfig->segments($team->settings), static fn(array $segment): bool => $segment['enabled'])),
+            'segments' => $segments,
             'days' => $days,
         ];
     }
 
     public function addCandidate(Team $team, string $month, int $slotId, string $targetUid, string $currentUid): void {
         $month = $this->shiftConfig->normalizeMonth($month);
-        $this->assertMonthMutable($team->code, $month);
-        $slot = $this->requireSlot($slotId, $team->code, $month);
         if ($targetUid === '') {
             if ($team->isEb) {
                 throw new \DomainException('Bitte eine Assistenzkraft auswählen.');
@@ -87,29 +105,44 @@ class ScheduleService {
         $this->assertCandidateMutationAllowed($team, $targetUid, $currentUid);
         $this->assertAssignableAssistantInTeam($team, $targetUid);
 
-        $this->store->addCandidate($slot->id, $targetUid, $currentUid);
+        $this->withMutableMonth($team->code, $month, $currentUid, function () use ($slotId, $team, $month, $targetUid, $currentUid): void {
+            $slot = $this->requireSlot($slotId, $team->code, $month);
+            $this->store->addCandidate($slot->id, $targetUid, $currentUid);
+        });
     }
 
     public function removeCandidate(Team $team, string $month, int $slotId, string $targetUid, string $currentUid): void {
         $month = $this->shiftConfig->normalizeMonth($month);
-        $this->assertMonthMutable($team->code, $month);
-        $slot = $this->requireSlot($slotId, $team->code, $month);
         $targetUid = $targetUid === '' ? $currentUid : $targetUid;
 
         $this->assertCandidateMutationAllowed($team, $targetUid, $currentUid);
         $this->assertAssignableAssistantInTeam($team, $targetUid);
 
-        $this->store->removeCandidate($slot->id, $targetUid);
+        $this->withMutableMonth($team->code, $month, $currentUid, function () use ($slotId, $team, $month, $targetUid): void {
+            $slot = $this->requireSlot($slotId, $team->code, $month);
+            $this->store->removeCandidate($slot->id, $targetUid);
+        });
     }
 
-    public function saveDayNote(Team $team, string $workDate, string $note, string $currentUid): void {
+    public function saveDayNote(Team $team, string $month, string $workDate, string $note, string $currentUid): void {
         if (!$team->isEb) {
             throw new \DomainException('Nur die Einsatzbegleitung darf Bemerkungen bearbeiten.');
         }
 
+        $month = $this->shiftConfig->normalizeMonth($month);
         $workDate = $this->shiftConfig->normalizeDate($workDate);
-        $this->assertMonthMutable($team->code, substr($workDate, 0, 7));
-        $this->store->saveDayNote($team->code, $workDate, trim($note), $currentUid);
+        if (!str_starts_with($workDate, $month . '-')) {
+            throw new \DomainException('Das Datum gehört nicht zum ausgewählten Planungsmonat.');
+        }
+        $note = $this->normalizeDayNote($note);
+        $this->withMutableMonth($team->code, $month, $currentUid, function () use ($team, $workDate, $note, $currentUid): void {
+            if ($note === '') {
+                $this->store->deleteDayNote($team->code, $workDate);
+                return;
+            }
+
+            $this->store->saveDayNote($team->code, $workDate, $note, $currentUid);
+        });
     }
 
     public function transitionMonthStatus(Team $team, string $month, string $targetStatus, string $currentUid): string {
@@ -128,11 +161,22 @@ class ScheduleService {
         if (!in_array($targetStatus, $allowedTargets[$currentStatus] ?? [], true)) {
             throw new \DomainException('Dieser Planstatuswechsel ist nicht erlaubt.');
         }
-        if (!$this->store->transitionMonthStatus($team->code, $month, $currentStatus, $targetStatus, $currentUid)) {
-            throw new \DomainException('Der Planstatus wurde zwischenzeitlich geändert. Bitte neu laden.');
-        }
 
-        return $targetStatus;
+        $this->store->ensureMonthStatus($team->code, $month, $currentUid);
+        return $this->store->transactional(function () use ($team, $month, $targetStatus, $currentUid, $currentStatus): string {
+            $lockedStatus = $this->store->lockMonthStatus($team->code, $month, [$currentStatus]);
+            if ($lockedStatus !== $currentStatus) {
+                throw new \DomainException('Der Planstatus wurde zwischenzeitlich geändert. Bitte neu laden.');
+            }
+            if ($targetStatus === self::STATUS_APPROVED) {
+                $this->ensureMonthSlots($team, $month);
+            }
+            if (!$this->store->transitionMonthStatus($team->code, $month, $currentStatus, $targetStatus, $currentUid)) {
+                throw new \DomainException('Der Planstatus wurde zwischenzeitlich geändert. Bitte neu laden.');
+            }
+
+            return $targetStatus;
+        });
     }
 
     private function ensureMonthSlots(Team $team, string $month): void {
@@ -190,6 +234,25 @@ class ScheduleService {
         }
     }
 
+    /** @param list<ShiftSlot> $slots */
+    private function segmentsFromFrozenSlots(array $slots): array {
+        $segments = [];
+        foreach ($slots as $slot) {
+            if (isset($segments[$slot->segmentKey])) {
+                continue;
+            }
+            $segments[$slot->segmentKey] = [
+                'key' => $slot->segmentKey,
+                'label' => $slot->label,
+                'startsAt' => $slot->startsAt,
+                'endsAt' => $slot->endsAt,
+                'enabled' => true,
+            ];
+        }
+
+        return array_values($segments);
+    }
+
     private function requireSlot(int $slotId, string $teamCode, string $month): ShiftSlot {
         $slot = $this->store->slotForMonth($slotId, $teamCode, $month);
         if ($slot === null || !$slot->enabled) {
@@ -229,9 +292,33 @@ class ScheduleService {
         }
     }
 
-    private function assertMonthMutable(string $teamCode, string $month): void {
-        if ($this->store->monthStatus($teamCode, $month) === self::STATUS_APPROVED) {
-            throw new \DomainException('Der genehmigte Monatsplan ist gegen Änderungen gesperrt.');
+    private function normalizeDayNote(string $note): string {
+        $note = trim($note);
+        $length = preg_match_all('/./us', $note);
+        if ($length === false) {
+            throw new \InvalidArgumentException('Bemerkungen müssen gültiges UTF-8 enthalten.');
         }
+        if ($length > self::MAX_DAY_NOTE_LENGTH) {
+            throw new \InvalidArgumentException('Bemerkungen dürfen höchstens 2.000 Zeichen lang sein.');
+        }
+
+        return $note;
+    }
+
+    private function withMutableMonth(string $teamCode, string $month, string $currentUid, callable $operation): mixed {
+        $this->store->ensureMonthStatus($teamCode, $month, $currentUid);
+
+        return $this->store->transactional(function () use ($teamCode, $month, $operation): mixed {
+            $status = $this->store->lockMonthStatus(
+                $teamCode,
+                $month,
+                [self::STATUS_DRAFT, self::STATUS_PLANNED]
+            );
+            if ($status === null) {
+                throw new \DomainException('Der genehmigte Monatsplan ist gegen Änderungen gesperrt.');
+            }
+
+            return $operation();
+        });
     }
 }

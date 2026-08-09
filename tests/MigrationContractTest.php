@@ -21,4 +21,21 @@ if (!str_contains($source, "'default' => 'draft'")) {
     throw new RuntimeException('Bestehende Monatspläne erhalten keinen sicheren Entwurfsstatus.');
 }
 
+$revisionMigration = __DIR__ . '/../lib/Migration/Version000004Date202608090001.php';
+if (!is_file($revisionMigration)) {
+    throw new RuntimeException('Die additive Revisionsmigration für atomare Monatsänderungen fehlt.');
+}
+$revisionSource = file_get_contents($revisionMigration);
+if ($revisionSource === false
+    || !str_contains($revisionSource, "hasColumn('revision')")
+    || !str_contains($revisionSource, "addColumn('revision', Types::INTEGER")
+    || !str_contains($revisionSource, "'default' => 0")) {
+    throw new RuntimeException('Bestehende Monatsstatuszeilen erhalten keine sichere Revisionsnummer ab 0.');
+}
+
+$info = file_get_contents(__DIR__ . '/../appinfo/info.xml');
+if ($info === false || !str_contains($info, '<version>0.4.0-rc.2</version>')) {
+    throw new RuntimeException('Die additive Revisionsmigration besitzt keinen neuen App-Versionsauslöser.');
+}
+
 echo "AdPlaner month plan migration contract test passed\n";

@@ -2,24 +2,6 @@
 
 Diese Datei bündelt geplante Erweiterungen und offene Produktentscheidungen. Verbindliche Fach-, Sicherheits- und Architekturregeln stehen in `AGENTS.md`.
 
-## Freigegebene Umsetzungsaufgaben
-
-### ADP-L10N – Assistenzplanung vollständig lokalisieren
-
-Status: als l10n-Pilot geeignet
-
-- Manuelle Monats-/Wochentagsnamen und sichtbare UI-, Status-, Validierungs-
-  und Fehlermeldungen auf aktive Nextcloud-Locale und Nextcloud-l10n
-  umstellen.
-- ISO-Daten, Monatsnummern, Schichtzeiten, Statuswerte, Teamcodes und
-  API-Schlüssel unverändert lassen; Abkürzungen nicht durch Abschneiden
-  bilden.
-- Deutsche Ausgabe, eine weitere Locale, Fallback, Monats-/Jahresgrenzen,
-  Pluralformen, Platzhalter und Escaping in PHP und JavaScript testen.
-- Erst nach vollständiger Pilotmigration den app-eigenen Rohtext-Check
-  verbindlich schalten und seinen Vertrag für die weiteren Apps
-  dokumentieren.
-
 ## Aktueller Fokus
 
 - Die manuellen Prüfungen werden im ausfüllbaren
@@ -29,6 +11,17 @@ Status: als l10n-Pilot geeignet
 
 ## Geplante Erweiterungen
 
+- **ADP-L10N – vollständige Lokalisierung (später, nicht freigegeben):**
+  AdPlaner wird im Rahmen des suiteweiten L10N-Rollouts auf die aktive
+  Nextcloud-Locale und Nextcloud-l10n umgestellt. Manuelle Monats- und
+  Wochentagsnamen sowie sichtbare UI-, Status-, Validierungs- und
+  Fehlermeldungen werden dabei vollständig migriert. ISO-Daten,
+  Monatsnummern, Schichtzeiten, Statuswerte, Teamcodes und API-Schlüssel
+  bleiben unverändert; Abkürzungen werden nicht durch Abschneiden gebildet.
+  Erforderlich sind Tests für deutsche Ausgabe, mindestens eine weitere
+  Locale, Fallback, Monats-/Jahresgrenzen, Pluralformen, Platzhalter und
+  Escaping in PHP und JavaScript. Pilot-App, Reihenfolge und Rohtext-Gate
+  werden vor Umsetzung suiteweit separat freigegeben.
 - Persönliche Monatsansicht „Alle meine Einsätze“ mit PDF-Export und optionaler Verbindung zu gängigen Kalendern.
 - Benachrichtigungen für relevante Planungs- und Statusänderungen.
 - Teambezogene Konfigurierbarkeit nur dort erweitern, wo konkrete Teams unterschiedliche Regeln benötigen.
