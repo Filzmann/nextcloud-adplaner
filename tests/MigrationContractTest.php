@@ -33,8 +33,8 @@ if ($revisionSource === false
     throw new RuntimeException('Bestehende Monatsstatuszeilen erhalten keine sichere Revisionsnummer ab 0.');
 }
 
-$info = file_get_contents(__DIR__ . '/../appinfo/info.xml');
-if ($info === false || !str_contains($info, '<version>0.4.0-rc.2</version>')) {
+$info = simplexml_load_file(__DIR__ . '/../appinfo/info.xml');
+if ($info === false || version_compare((string)$info->version, '0.4.0-rc.2', '<')) {
     throw new RuntimeException('Die additive Revisionsmigration besitzt keinen neuen App-Versionsauslöser.');
 }
 
