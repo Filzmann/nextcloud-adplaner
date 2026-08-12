@@ -11,6 +11,19 @@ Diese Datei bündelt geplante Erweiterungen und offene Produktentscheidungen. Ve
 
 ## Geplante Erweiterungen
 
+- **ADP-MOBILE – smartphone-taugliche Planung und kompakte Menüs:**
+  Monatsplan, persönliche Einsätze, Schichtauswahl und die wichtigsten
+  Planungsaktionen erhalten eine auf kleinen Smartphone-Viewports vollständig
+  nutzbare responsive Darstellung. Die Lösung darf nicht nur die
+  Desktop-Matrix horizontal scrollbar machen; Prioritäten, Status,
+  Schichtzeiten, Zuständigkeit und erlaubte Aktionen müssen ohne Verlust des
+  fachlichen Kontexts erreichbar bleiben. Menüs und Filter werden kompakter
+  gruppiert, wobei häufige Aktionen direkt sichtbar sowie Beschriftungen,
+  Tastaturbedienung, Fokus und ausreichend große Touch-Ziele erhalten bleiben.
+  Vor der Umsetzung werden die mobilen Kernabläufe für Assistenz und EB
+  festgelegt. Tests decken mindestens kleine Viewports, beide Rollen,
+  Menü-/Filterbedienung, Fokusreihenfolge, Zoom, lange Beschriftungen sowie
+  vertikales und gegebenenfalls lokal begrenztes horizontales Scrollen ab.
 - **ADP-L10N – vollständige Lokalisierung (später, nicht freigegeben):**
   AdPlaner wird im Rahmen des suiteweiten L10N-Rollouts auf die aktive
   Nextcloud-Locale und Nextcloud-l10n umgestellt. Manuelle Monats- und

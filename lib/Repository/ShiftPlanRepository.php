@@ -34,6 +34,40 @@ class ShiftPlanRepository {
         }
     }
 
+    /** @return array{candidates:list<array<string,mixed>>,dayNotes:list<array<string,mixed>>,monthPlans:list<array<string,mixed>>} */
+    public function personalDataForUid(string $uid, int $limit): array {
+        $candidateQuery = $this->db->getQueryBuilder();
+        $candidateQuery->select('c.id', 'c.assistant_uid', 'c.created_by_uid', 'c.created_at', 's.team_code', 's.work_date', 's.label', 's.starts_at', 's.ends_at')
+            ->from('adp_shift_candidates', 'c')
+            ->innerJoin('c', 'adp_shift_slots', 's', $candidateQuery->expr()->eq('s.id', 'c.slot_id'))
+            ->where($candidateQuery->expr()->orX(
+                $candidateQuery->expr()->eq('c.assistant_uid', $candidateQuery->createNamedParameter($uid)),
+                $candidateQuery->expr()->eq('c.created_by_uid', $candidateQuery->createNamedParameter($uid)),
+            ))
+            ->orderBy('c.created_at', 'ASC')
+            ->setMaxResults($limit);
+
+        $noteQuery = $this->db->getQueryBuilder();
+        $noteQuery->select('id', 'team_code', 'work_date', 'note', 'updated_at')
+            ->from('adp_day_notes')
+            ->where($noteQuery->expr()->eq('updated_by_uid', $noteQuery->createNamedParameter($uid)))
+            ->orderBy('updated_at', 'ASC')
+            ->setMaxResults($limit);
+
+        $monthQuery = $this->db->getQueryBuilder();
+        $monthQuery->select('id', 'team_code', 'plan_month', 'status', 'updated_at')
+            ->from('adp_month_plans')
+            ->where($monthQuery->expr()->eq('updated_by_uid', $monthQuery->createNamedParameter($uid)))
+            ->orderBy('updated_at', 'ASC')
+            ->setMaxResults($limit);
+
+        return [
+            'candidates' => $candidateQuery->executeQuery()->fetchAllAssociative(),
+            'dayNotes' => $noteQuery->executeQuery()->fetchAllAssociative(),
+            'monthPlans' => $monthQuery->executeQuery()->fetchAllAssociative(),
+        ];
+    }
+
     public function findSlotsForMonth(string $teamCode, string $month): array {
         $qb = $this->db->getQueryBuilder();
         $qb->select('*')

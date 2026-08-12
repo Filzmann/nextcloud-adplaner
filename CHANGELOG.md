@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0-rc.1
+
+- Subjectgebundene persönliche Datenauskunft für Schichtwünsche, Schichtzuweisungen und eigene Bearbeitungsreferenzen ergänzt.
+- Fremde Personenkennungen und potenziell drittpersonenbezogene freie Tagesnotiztexte aus der Self-Service-Auskunft ausgeschlossen.
+
 ## 0.4.0-rc.2
 
 - Monatsplanänderungen und Statuswechsel gegen konkurrierende Freigaben serialisiert; genehmigte Schichtdefinitionen bleiben als unveränderlicher Planstand erhalten.
